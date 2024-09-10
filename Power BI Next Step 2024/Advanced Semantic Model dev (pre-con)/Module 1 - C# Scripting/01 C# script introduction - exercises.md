@@ -253,4 +253,91 @@ In this exercise, we will extend the **Create SUM measures from column** script 
 - [`COUNT`](https://dax.guide/count)
 - [`DISTINCTCOUNT`](https://dax.guide/distinctcount)
 
-  
+For this exercise, we'll need to instantiate a [Form](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.form?view=windowsdesktop-8.0) and populate it with the following controls:
+
+- A [Label](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.label?view=windowsdesktop-8.0) which will show instructions to the user
+- A [ComboBox](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.combobox?view=windowsdesktop-8.0) from which the user can choose which type of aggregation they want
+- A [Button](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.button?view=windowsdesktop-8.0) which the user can press to confirm the selection
+
+All these things are known as **Controls** in the world of WinForms application development. They live in the `System.Windows.Forms` namespace, so we'll need to import that by adding a suitable `using` clause at the top of the script. We'll also need the `System.Drawing` namespace, but since this originates from a .NET assembly that is not normally referenced in C# scripts, we will have to manually add the assembly reference. To that end, we can use the `#r` directive at the very top of the script. Lastly, we'll toggle off `Application.UseWaitCursor`, since Tabular Editor scripts normally show a wait cursor while scripts are executing. However, since we're going to display UI elements that the user can interact with using the mouse, we don't want to show a wait cursor.
+
+The first few lines of the script should look like this:
+
+```csharp
+#r "System.Drawing"
+using System.Windows.Forms;
+using System.Drawing;
+
+Application.UseWaitCursor = false;
+```
+
+Next, we want to start creating the various UI controls. The first thing we'll need, is a the `Form`. There are many properties we can set on this class, but we'll just apply the basics to obtain a rectangular, non-sizable form, with the title "Select aggregation", no icon and no maximize / minimize buttons. We'll also use `AutoSize = true` and `AutoSizeMode = AutoSizeMode.GrowAndShrink`, so the Form will automatically resize itself to accomodate the controls we put in.
+
+> [!TIP]
+> If you have access to ChatGPT, Claude, or a similar LLM, you can often learn a lot by prompting it to help you create the C# WinForms UI controls you need. For example: "Could you create a C# script using WinForms, which creates a single from with a label, a dropdown combobox and an "OK" button which will close the form when pressed?"
+
+```csharp
+var aggForm = new Form
+{ 
+    Text = "Select aggregation",
+    MaximizeBox = false, 
+    MinimizeBox = false, 
+    ShowIcon = false,
+    AutoSize = true,
+    AutoSizeMode = AutoSizeMode.GrowAndShrink,
+    FormBorderStyle = FormBorderStyle.FixedDialog,
+    StartPosition = FormStartPosition.CenterParent
+};
+```
+
+To actually display the form, we use `aggForm.ShowDialog();`. This method shows the form as a [modal dialog](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.form.showdialog?view=windowsdesktop-8.0#system-windows-forms-form-showdialog), blocking further script execution until the form is closed by the user. The method returns information about why the form was closed (i.e. if the user clicked an Accept or Cancel button, or if they hit the Close button in the top-right corner).
+
+Before we show the form, let's add the other controls as well. While we could perform the positioning of controls manually by specifying their `Size` and `Location`, we prefer to use a [FlowLayoutPanel](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.flowlayoutpanel?view=netframework-4.8) since this takes care of positioning the child controls. This panel also needs to be marked with `AutoSize = true` and `AutoSizeMode = AutoSizeMode.GrowAndShrink`, for the same reason as we applied these settings to the Form.
+
+```csharp
+var flowPanel = new FlowLayoutPanel
+{
+    Padding = new Padding(10),
+    FlowDirection = FlowDirection.TopDown,
+    WrapContents = false,
+    AutoSize = true,
+    AutoSizeMode = AutoSizeMode.GrowAndShrink
+};
+```
+
+Then, we create the three controls (label, combobox, and button) and add them to the flowPanel:
+
+```csharp
+var label = new Label { Text = "Select aggregation method", AutoSize = true };
+var comboBox = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, AutoSize = true, };
+comboBox.Items.AddRange(new object[] { "SUM", "MIN", "MAX", "AVERAGE", "COUNT", "DISTINCTCOUNT" } );
+comboBox.SelectedIndex = 0;
+var button = new Button { Text = "OK", AutoSize = true, DialogResult = DialogResult.OK };
+
+flowPanel.Controls.AddRange(new Control[] { label, comboBox, button });
+```
+
+Lastly, we add the flowPanel to the form, and we also assign out button as the [AcceptButton](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.form.acceptbutton?view=netframework-4.8) of the form, which is good practice.
+
+```csharp
+aggForm.Controls.Add(flowPanel);
+aggForm.AcceptButton = button;
+```
+
+Finally, we're ready to show the dialog and behold our masterpiece. We use a conditional because we want to terminate our script if the user hits the close button, rather than our "OK" button. If the user didn't cancel, we assign the DAX aggregation function chosen to the `aggFunction` variable (which we'll use later when creating the measures):
+
+```csharp
+if(aggForm.ShowDialog() == DialogResult.Cancel) return;
+var aggFunction = comboBox.SelectedItem.ToString(); // SUM, MIN, MAX, AVERAGE, COUNT or DISTINCTCOUNT
+```
+
+![image](https://github.com/user-attachments/assets/637975ce-a7cc-4f73-944c-fbfa495afccf)
+
+I leave it up to you, to add the script from exercise 1.5, which will actually add the measures to the model. Don't forget to update the part of the code that assigns the DAX expression of the measure, so it uses `aggFunction` rather than the hard-coded `SUM`.
+
+<details>
+  <summary>Click to view solution</summary>
+
+The full script solution can be found here: [Exercise 1.6 full solution.csx]
+
+</details>
