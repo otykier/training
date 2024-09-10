@@ -35,6 +35,21 @@ To write and run C# scripts in **Tabular Editor 2**, the general steps are the f
 
 </details>
 
+The exercises below will introduce you to the world of C# scripting in Tabular Editor. The exercises will teach you basic C# syntax, while also introducing you to Tabular Editor-specific concepts and helper methods / extensions from the TOMWrapper API. Below is a summary of key concepts that you will need to use in the scripts:
+
+- **Top-level objects**: The common "entry points" for scripts that need to interact with the currently loaded model
+  - `Model`: The root of the Tabular Object Model hierarchy. Provides read/write access to all of the semantic model metadata.
+  - `Selected`: An object holding information about the currently selected objects in Tabular Editor's TOM Explorer UI. Useful when creating generic scripts that need to interact with the users' current selection.
+- **Helper methods**: Methods that only exist in Tabular Editor, which can be used to debug scripts, or display information to the user.
+  - `void Info(string message)`: Used to display an informational message to the user.
+  - `void Warning(string message)`: Used to display a warning message to the user.
+  - `void Error(string message)`: Used to display an error message to the user.
+  - For a full list of helper methods, see the [API documentation](https://docs.tabulareditor.com/api/TabularEditor.Shared.Scripting.ScriptHost.html#methods).
+- **TOM extensions**: Methods and properties from the TOMWrapper API, which make certain semantic modeling related tasks easier.
+  - `int Model.AllMeasures`: Returns an enumeration of all measures across all tables in the model (same as `Model.Tables.SelectMany(t => t.Measures)`)
+  - `Measure Table.AddMeasure(string name, string expression)`: Adds a measure to the current table, with the given name and expression
+  - `string Column.DaxObjectFullName`: A property that returns a valid DAX reference to the current column, i.e.: `'Internet Sales'[Line Amount]`
+
 ## Exercise 1.1 - "Hello world!"
 
 Write a script which will do nothing except show a message to the user.
@@ -175,5 +190,20 @@ else if(Model.Tables.Count > 0)
 else
     Error("Cannot add measure when no tables exist in the model");
 ```
+
+</details>
+
+## Exercise 1.5 - Create SUM measures from columns
+
+A common use case for C# scripts, and a best practice when creating semantic models, is to hide numeric, aggregatable columns (aka. _implicit_ measures) and create an actual, _explicit_ measure that performs the aggregation (i.e. `SUM`) of the column.
+
+Write a script that will create one measure for each currently selected column. The created measure should just return the `SUM` of that column. Add a suitable description to the measure, set the format string to `0.00` and hide the column.
+
+**Hint:** Objects that can be referenced in DAX expressions (tables, columns, measures) have a `DaxObjectFullName` property, which returns a string that contains a valid DAX reference to the current object.
+
+<details>
+  <summary>Click to view solution</summary>
+
+This is the first example on the [Useful script snippets](https://docs.tabulareditor.com/te2/Useful-script-snippets.html#create-measures-from-columns) article.
 
 </details>
