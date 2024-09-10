@@ -338,6 +338,6 @@ I leave it up to you, to add the script from exercise 1.5, which will actually a
 <details>
   <summary>Click to view solution</summary>
 
-The full script solution can be found here: [Exercise 1.6 full solution.csx]
+The full script solution can be found here: [01 Exercise 1.6 full solution.csx](01%20Exercise%201.6%20full%20solution.csx)
 
 </details>
