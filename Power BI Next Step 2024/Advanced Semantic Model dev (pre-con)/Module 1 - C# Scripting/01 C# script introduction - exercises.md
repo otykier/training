@@ -341,3 +341,10 @@ I leave it up to you, to add the script from exercise 1.5, which will actually a
 The full script solution can be found here: [01 Exercise 1.6 full solution.csx](01%20Exercise%201.6%20full%20solution.csx)
 
 </details>
+
+**Bonus:** Looking for even more challenges? If time permits, here are some suggestions for more functionality you can build into the script:
+
+- Add a [TextBox](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.textbox?view=windowsdesktop-8.0) to `aggForm`, where users can provide a custom format string to apply, instead of hard-coding `"0.00"` in the script.
+- Add another TextBox, where users can specify a `DisplayFolder` for the measure.
+- Add a third TextBox, where users can provide a custom prefix to the measure name, rather than using the hard-coded `"Sum of " + ...`,
+- Use the `SelectTable()` helper method, to let users choose which table the measures should be created in, rather than creating the measures on the same table as the selected columns.
