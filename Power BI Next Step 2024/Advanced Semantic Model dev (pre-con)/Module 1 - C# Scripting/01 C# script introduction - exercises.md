@@ -239,3 +239,18 @@ foreach(var c in Selected.Columns)
 ```
 
 </details>
+
+## Exercise 1.6 - (Advanced) Custom UI
+
+Scripts can use [WinForms](https://learn.microsoft.com/en-us/dotnet/desktop/winforms/?view=netdesktop-8.0) to create customized UI, allowing for more user-friendly interactions for the person running the script.
+
+In this exercise, we will extend the **Create SUM measures from column** script from exercise 1.5 above, to allow the user to select which type of aggregation they want the measures to perform. That is, instead of the script being hardcoded to use the `SUM` DAX function, we will allow the user to select between any of the following DAX aggregation functions (which all take a column reference as the first and only parameter):
+
+- [`SUM`](https://dax.guide/sum)
+- [`MIN`](https://dax.guide/min)
+- [`MAX`](https://dax.guide/max)
+- [`AVERAGE`](https://dax.guide/average)
+- [`COUNT`](https://dax.guide/count)
+- [`DISTINCTCOUNT`](https://dax.guide/distinctcount)
+
+  
