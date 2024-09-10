@@ -31,9 +31,9 @@ To write and run C# scripts in **Tabular Editor 2**, the general steps are the f
 
 </details>
 
-## Exercise 1 - Write a "Hello world!" script
+## Exercise 1.1 - "Hello world!"
 
-- [ ] Write a script which will do nothing except show a message to the user.
+Write a script which will do nothing except show a message to the user.
 
 <details>
   <summary>Click to view solution</summary>
@@ -43,4 +43,32 @@ To write and run C# scripts in **Tabular Editor 2**, the general steps are the f
   ```
 </details>
 
-#
+## Exercise 1.2 - Basic model stats
+
+Write a script that will output the following information:
+
+- The name of the model
+- The number of tables in the model
+- The number of measures in the model
+- The number of _visible_ measures in the model
+- The number of _visible_ measures in the model, that does not have any description specified
+
+<details>
+  <summary>Click to view solution</summary>
+
+  ```csharp
+var modelName = Model.Name;
+var tables = Model.Tables.Count;
+var measures = Model.AllMeasures.Count();
+var visibleMeasures = Model.AllMeasures.Count(m => m.IsVisible);
+var visibleMeasuresNoDesc = Model.AllMeasures.Count(m => m.IsVisible && string.IsNullOrEmpty(m.Description));
+
+var text = @"Model name: {0}
+Tables: {1}
+Measures: {2}
+Visible measures: {3}
+Visible measures without descriptions: {4}";
+
+string.Format(text, modelName, tables, measures, visibleMeasures, visibleMeasuresNoDesc).Output();
+  ```
+</details>
