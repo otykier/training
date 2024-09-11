@@ -132,7 +132,64 @@ Model.AllCalculationItems.FormatDax();
   
 </details>
 <details>
-<summary><h3>Exercise 2.3 - Parameter table</h3></summary>
+<summary><h3>Exercise 2.3 - "Can I export this to Excel?"</h3></summary>
+
+Sometimes, it's useful to ask business users to provide their own descriptions of the various visible objects in the model, since descriptions show up as tooltips in client tools (Excel, Power BI). And since business users love Excel so much, we may as well just give them the list of objects in a format they can work with in Excel.
+
+### 2.3a
+Write a script that will create a TSV file containing all visible model objects (tables, columns, hierarchies, and measures), including only their "Description" property.
+
+<details><summary>Click to view solution</summary>
+
+```csharp
+var objects = new List<TabularNamedObject>();
+objects.AddRange(Model.Tables.Where(t => t.IsVisible));
+objects.AddRange(Model.AllColumns.Where(c => c.IsVisible));
+objects.AddRange(Model.AllHierarchies.Where(h => h.IsVisible));
+objects.AddRange(Model.AllMeasures.Where(m => m.IsVisible));
+
+var tsvData = ExportProperties(objects, "Description");
+tsvData.Output();
+// SaveFile("c:\\temp\\model-objects.tsv", tsvData);
+```
+
+</details>
+
+### 2.3b
+Write a script that will read a TSV file containing object descriptions, similar to the one created in **2.3a**, and apply those to the model.
+
+<details><summary>Click to view solution</summary>
+
+```csharp
+var tsvData = ReadFile("c:\\temp\\model-objects.tsv");
+ImportProperties(tsvData);
+```
+
+</details>
+
+**Bonus:** Add a Danish translation to the model (da-DK). Then, extend the script from **2.3a** above, so that the TSV file also includes the `Name` property, the `DisplayFolder` property, as well as `TranslatedNames[da-DK]`, `TranslatedDescriptions[da-DK]`, and `TranslatedDisplayFolders[da-DK]`, so the business users also have a way to provide danish translations for the objects.
+
+<details><summary>Click to view solution</summary>
+
+```csharp
+var objects = new List<TabularNamedObject>();
+objects.AddRange(Model.Tables.Where(t => t.IsVisible));
+objects.AddRange(Model.AllColumns.Where(c => c.IsVisible));
+objects.AddRange(Model.AllHierarchies.Where(h => h.IsVisible));
+objects.AddRange(Model.AllMeasures.Where(m => m.IsVisible));
+
+var tsvData = ExportProperties(objects, "Name,Description,DisplayFolder,TranslatedNames[da-DK],TranslatedDescriptions[da-DK],TranslatedDisplayFolders[da-DK]");
+tsvData.Output();
+// SaveFile("c:\\temp\\model-objects.tsv", tsvData);
+```
+
+</details>
+
+</details>
+
+</details>
+<details>
+<summary><h3>Exercise 2.4 - Parameter table</h3></summary>
 
 A [parameter table](https://www.daxpatterns.com/parameter-table/) is a table that does not have any relationships to other tables in the model. Typically, the table only contains a single column. Any selection/filter made on the table, is observed in suitable DAX expressions within measures.
 
