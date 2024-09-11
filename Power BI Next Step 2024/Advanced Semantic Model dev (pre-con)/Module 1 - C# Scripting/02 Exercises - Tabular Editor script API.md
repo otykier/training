@@ -414,7 +414,8 @@ Selected.Measure.Tokenize(includeHidden: false).Output();
 **Hint:** .NET does not have a built-in method for replacing a section of a string with another string, based on character positions. However, we can easily create our own utility method to do this:
 
 ```csharp
-class Util {
+class Util
+{
     public static string Replace(string original, int startIndex, int length, string replacement)
     {
         if (startIndex < 0 || startIndex >= original.Length)
@@ -438,7 +439,7 @@ Info(result);
 
 <details><summary>Click to view solution</summary>
 
-Full solution can be found here:
+The full script solution can be found here: [Exercise 2.6 - full solution.csx](Exercise%202.6%20-%20full%20solution.csx)
 
 </details>
 
