@@ -405,8 +405,46 @@ Now for the exercise. Some guy with an italian accent, has told you that `SUM('T
 
 **Hint:** Use the `Output()` method to view the list of tokens produced by the `Tokenize()` method.
 
+```csharp
+Selected.Measure.Tokenize(includeHidden: false).Output();
+```
+
 <img src="https://github.com/user-attachments/assets/5de466a1-4b84-4478-8ff2-bebc42e339df" width="75%">
 
-**Hint:** .NET does not have a built-in method for replacing a section of a string with another string, based on character positions. However, we can easily create our own utility method to do this:
+**Hint:** .NET does not have a built-in method for replacing a section of a string with another string, based on character positions. However, we can easily create our own utility method to do this. While we're at it, let's also add a similar method which takes a DaxToken as input, rather than the character index and length:
+
+```csharp
+class Util {
+    public static string Replace(string original, int startIndex, int length, string replacement)
+    {
+        if (startIndex < 0 || startIndex >= original.Length)
+            throw new ArgumentOutOfRangeException("startIndex");
+        
+        if (length < 0 || startIndex + length > original.Length)
+            throw new ArgumentOutOfRangeException("length");
+
+        return original.Substring(0, startIndex) + replacement + original.Substring(startIndex + length);
+    }
+    
+    public static string Relace(string original, DaxToken token, string replacement)
+    {
+        return Replace(original, token.StartIndex, token.StopIndex - token.StartIndex + 1, replacement);
+    }
+}
+
+string original = "Hello, World!";
+string result = Util.Replace(original, 7, 5, "Universe");
+
+// Outputs "Hello, Universe!";
+Info(result);
+```
+
+**Hint:** Since a single DAX expression can contain multiple occurrences of `SUM`, it is important that we replace all of them. However, once we perform a replace, the DaxToken character indexes no longer match the actual positions in the DAX expression, since the replace operation may have shifted characters to the right of the insertion. So we'll either need to run the tokenizer again, or, better yet, perform the replace in reverse order, starting with the **last** occurrence of `SUM` within the string.
+
+<details><summary>Click to view solution</summary>
+
+Full solution can be found here:
+
+</details>
 
 </details>
