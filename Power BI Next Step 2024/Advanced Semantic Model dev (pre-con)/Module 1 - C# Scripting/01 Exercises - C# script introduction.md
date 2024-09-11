@@ -1,5 +1,7 @@
 # C# script introduction - exercises
 
+(Click on the section headers to expand/collapse)
+
 <details>
 <summary><h2>Introduction</h2></summary>
 
