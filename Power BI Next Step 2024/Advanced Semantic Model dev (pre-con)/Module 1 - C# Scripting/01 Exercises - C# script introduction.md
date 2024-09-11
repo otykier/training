@@ -1,5 +1,8 @@
 # C# script introduction - exercises
 
+<details>
+<summary><h2>Introduction</h2></summary>
+
 In all these exercises, you will use the C# scripting feature of Tabular Editor to solve various problems.
 
 Remember, you can always **undo** the model metadata changes caused by a script, by moving the focus over to the TOM Explorer and hitting **Ctrl+Z** (**Edit > Undo script**).
@@ -50,7 +53,9 @@ The exercises below will introduce you to the world of C# scripting in Tabular E
   - `Measure Table.AddMeasure(string name, string expression)`: Adds a measure to the current table, with the given name and expression
   - `string Column.DaxObjectFullName`: A property that returns a valid DAX reference to the current column, i.e.: `'Internet Sales'[Line Amount]`
 
-## Exercise 1.1 - "Hello world!"
+</details>
+<details>
+<summary><h3>Exercise 1.1 - "Hello world!</h3></summary>
 
 Write a script which will do nothing except show a message to the user.
 
@@ -62,7 +67,9 @@ Write a script which will do nothing except show a message to the user.
   ```
 </details>
 
-## Exercise 1.2 - Basic model stats
+</details>
+<details>
+<summary><h3>Exercise 1.2 - Basic model stats</h3></summary>
 
 Write a script that will output the following information:
 
@@ -92,7 +99,9 @@ string.Format(text, modelName, tables, measures, visibleMeasures, visibleMeasure
   ```
 </details>
 
-## Exercise 1.3 - Output selection details
+</details>
+<details>
+<summary><h3>Exercise 1.3 - Output selection details</h3></summary>
 
 Write a script that will investigate the current selection, with the following conditions:
 
@@ -129,7 +138,9 @@ else
 
 </details>
 
-## Exercise 1.4 - Create system measure
+</details>
+<details>
+<summary><h3>Exercise 1.4 - Create system measure</h3></summary>
 
 Write a script that will add a measure to the currently selected table. The measure should have the name "System Info", and contain the following DAX:
 
@@ -193,7 +204,9 @@ else
 
 </details>
 
-## Exercise 1.5 - Create SUM measures from columns
+</details>
+<details>
+<summary><h3>Exercise 1.5 - Create SUM measures from columns</h3></summary>
 
 A common use case for C# scripts, and a best practice when creating semantic models, is to hide numeric, aggregatable columns (aka. _implicit_ measures) and create an actual, _explicit_ measure that performs the aggregation (i.e. `SUM`) of the column.
 
@@ -240,7 +253,9 @@ foreach(var c in Selected.Columns)
 
 </details>
 
-## Exercise 1.6 - (Advanced) Custom UI
+</details>
+<details>
+<summary><h3>Exercise 1.6 - (Advanced) Custom UI</h3></summary>
 
 Scripts can use [WinForms](https://learn.microsoft.com/en-us/dotnet/desktop/winforms/?view=netdesktop-8.0) to create customized UI, allowing for more user-friendly interactions for the person running the script.
 
@@ -348,3 +363,5 @@ The full script solution can be found here: [Exercise 1.6 - full solution.csx](E
 - Add another TextBox, where users can specify a `DisplayFolder` for the measure.
 - Add a third TextBox, where users can provide a custom prefix to the measure name, rather than using the hard-coded `"Sum of " + ...`,
 - Use the `SelectTable()` helper method, to let users choose which table the measures should be created in, rather than creating the measures on the same table as the selected columns.
+
+</details>
