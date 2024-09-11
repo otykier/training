@@ -84,9 +84,9 @@ Try to avoid the temptation to use `foreach` loops, `for` loops, or `if` stateme
 <details><summary>Click to view solution</summary>
 
 ```csharp
-Selected.Measures.Where(m => !string.IsNullOrEmpty(m.FormatString)).FormatString = "#.##0,00";
-Selected.Measures.Where(m => !string.IsNullOrEmpty(m.DisplayFolder)).DisplayFolder = "Measures";
-Selected.Measures.Where(m => !string.IsNullOrEmpty(m.Description) && m.IsVisible).Description = "TODO: Provide a description for this measure";
+Selected.Measures.Where(m => string.IsNullOrEmpty(m.FormatString)).FormatString = "#.##0,00";
+Selected.Measures.Where(m => string.IsNullOrEmpty(m.DisplayFolder)).DisplayFolder = "Measures";
+Selected.Measures.Where(m => string.IsNullOrEmpty(m.Description) && m.IsVisible).Description = "TODO: Provide a description for this measure";
 ```
 
 </details>
