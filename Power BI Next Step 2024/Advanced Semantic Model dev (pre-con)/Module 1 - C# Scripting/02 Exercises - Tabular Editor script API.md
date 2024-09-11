@@ -1,5 +1,8 @@
 # Tabular Editor script API - exercises
 
+<details>
+<summary><h2>Introduction</h2></summary>
+
 In all these exercises, you will use the C# scripting feature of Tabular Editor to solve various problems.
 
 Remember, you can always **undo** the model metadata changes caused by a script, by moving the focus over to the TOM Explorer and hitting **Ctrl+Z** (**Edit > Undo script**).
@@ -71,7 +74,9 @@ The exercises below will build upon what you learned in the previous exercises, 
 - **Tokenizing DAX**:
   - `Tokenize(this IDaxDepedantObject obj, DAXProperty property = DAXProperty.Expression, bool includeHidden = true)`: Tokenizes the specified DAX expression on the object. Includes hidden tokens (comments, whitespace) by default.
 
-## Exercise 2.1 - Apply default properties
+</details>
+<details>
+<summary><h3>Exercise 2.1 - Apply default properties</h3></summary>
 
 Write a script which will work on any number of selected measures. The script should:
 
@@ -89,4 +94,79 @@ Selected.Measures.Where(m => string.IsNullOrEmpty(m.DisplayFolder)).DisplayFolde
 Selected.Measures.Where(m => string.IsNullOrEmpty(m.Description) && m.IsVisible).Description = "TODO: Provide a description for this measure";
 ```
 
+</details>
+
+</details>
+<details>
+<summary><h3>Exercise 2.2 - Parameter table</h3></summary>
+
+A [parameter table](https://www.daxpatterns.com/parameter-table/) is a table that does not have any relationships to other tables in the model. Typically, the table only contains a single column. Any selection/filter made on the table, is observed in suitable DAX expressions within measures.
+
+In this exercise, we'll write a script that dynamically creates a calculated table and a `SWITCH` measure, based on a selection of measures in the TOM Explorer. The idea is to have a single measure, which can display the result of any one of the selected measures, when the user applies a filter on the calculated table (which serves as our parameter table).
+
+For example, if the user selects the following measures in the TOM Explorer and runs the script:
+
+- [Sales Amount]
+- [Cost Amount]
+- [Margin Amount]
+- [Margin Pct]
+
+The script should generate a calculated table named 'Measure Selection', with the following DAX expression:
+
+```dax
+{
+    NAMEOF([Sales Amount]),
+    NAMEOF([Cost Amount]),
+    NAMEOF([Margin Amount]),
+    NAMEOF([Margin Pct])
+}
+```
+
+It's recommended to use the [`NAMEOF`](https://dax.guide/nameof) function instead of hard-coding the names of the measures as strings. This way, if you ever rename one of the measures, the DAX inside the calculated table will be correctly updated.
+
+The script should also generate a measure, on the same table as the original 4 measures were selected, with the name `Dynamic Measure`, and the following DAX expression:
+
+```dax
+SWITCH(
+    SELECTEDVALUE('Measure Selection'[Value]),
+    NAMEOF([Sales Amount]), [Sales Amount],
+    NAMEOF([Cost Amount]), [Cost Amount],
+    NAMEOF([Margin Amount]), [Margin Amount],
+    NAMEOF([Margin Pct]), [Margin Pct],
+    "Please make a selection on the 'Measure Selection' table"
+)
+```
+
+After running the script, confirm everything works by refreshing the model (use Power BI Desktop or SSMS), and create a Matrix (in Power BI Desktop) or Pivot Table (in Excel), which slices [Dynamic Measure] by the [Value] column of the 'Measure Selection' table. You should see something like the following (depending on which measures you included in your selection when the script was executed):
+
+![image](https://github.com/user-attachments/assets/78a02fd6-94e6-4a1a-a9d1-0a2469c4e30f)
+
+<details><summary>Click to view solution</summary>
+
+```csharp
+if(Selected.Measures.Count == 0)
+{
+    Info("No measures selected!");
+    return;
+}
+
+var calcTableDax = @"{{
+{0}
+}}";
+var switchMeasureDax = @"SWITCH(
+    SELECTEDVALUE('Measure Selection'[Value]),
+{0},
+    ""Please make a selection on the 'Measure Selection' table""
+)";
+
+var calcTableInner = string.Join(",\r\n", Selected.Measures.Select(m => "    NAMEOF(" + m.DaxObjectName + ")"));
+var switchMeasureInner = string.Join(",\r\n", Selected.Measures.Select(m => "    NAMEOF(" + m.DaxObjectName + "), " + m.DaxObjectName));
+
+var table = Selected.Measures.First().Table;
+
+Model.AddCalculatedTable("Measure Selection", string.Format(calcTableDax, calcTableInner));
+table.AddMeasure("Dynamic Measure", string.Format(switchMeasureDax, switchMeasureInner));
+```
+
+</details>
 </details>
