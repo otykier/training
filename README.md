@@ -7,7 +7,7 @@ This repository contains various samples, exercises, and training materials, whi
 - [Power BI Next Step 2024 Full-day training](https://github.com/otykier/training/tree/main/Power%20BI%20Next%20Step%202024/Advanced%20Semantic%20Model%20dev%20(pre-con))
 - [Sample models](https://github.com/otykier/training/tree/main/Sample%20models)
 
-# How to contribute
+## How to contribute
 
 Feel free to fork this repository and submit pull requests if you want to add/modify something.
 
