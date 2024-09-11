@@ -393,7 +393,7 @@ View the [full list of DaxTokens available in the TE2 tokenizer](https://github.
 
 Now for the exercise. Some guy with an italian accent, has told you that `SUM('Table'[Column])` is just syntax sugar for `SUMX('Table', 'Table'[Column])`. Health experts say that sugar is bad for you, so naturally you want to change all occurrences of `SUM` in your measures, to the equivalent `SUMX`.
 
-**Write a script which will use the tokenizer to detect all occurrences of `DaxToken.SUM` in the DAX expressions on your measures.**
+**Write a script which will replace all occurrences of `SUM` in your measures, with the equivalent `SUMX`. Your solution must use the tokenizer, to ensure that you don't accidentally replace occurrences of the word `SUM` when not used as a DAX function call.**
 
 **Hint:** If we ignore whitespace and comments, and assume that the column reference is always qualified with the table name, the token sequence would always look something like this:
 
