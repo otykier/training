@@ -443,4 +443,11 @@ The full script solution can be found here: [Exercise 2.6 - full solution.csx](E
 
 </details>
 
+**Bonus:** Looking for even more challenges? If time permits, here are some suggestions for more functionality you can build into the script:
+
+- Support the other aggregation/iterator functions as well. `AVERAGE` -> `AVERAGEX`, `MIN` -> `MINX` and `MAX` -> `MAXX`. Note that [`MIN`](https://dax.guide/min) and [`MAX`](https://dax.guide/max) have an optional 2nd argument. When the 2nd arg is specified, the function is no longer an aggregation. Instead, it just returns the smaller/larger of the two arguments specified, so the script will have to check that only 1 argument is specified (one way to do that, is to check that there are no `DaxToken.COMMA` between the `DaxToken.OPEN_PARENS` and `DaxToken.CLOSE_PARENS`).
+- The solution we provided above works, but it messes with the formatting, in case whitespace is present somewhere in the sequence of tokens (for example, if a space is present before the opening parenthesis, or the expression is broken across multiple lines). Let's refine the solution a bit by performing two replacements for each encountered `SUM`:
+  - Replacing just the `DaxToken.SUM` token with `SUMX`
+  - Replacing the substring spanned by the `DaxToken.TABLE` and `DaxToken.COLUMN_OR_MEASURE` tokens, with the 2 arguments needed for `SUMX`: `'Table', 'Table'[Column]`.
+
 </details>
