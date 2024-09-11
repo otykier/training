@@ -5,3 +5,5 @@ The sample models provided in this library are based on the [Spaceparts Co. Data
 You are allowed to use the dataset as a **learning resource** for **personal use only**.
 
 Using the dataset for public presentations (for example community conferences) or classroom training sessions, is not allowed without prior written permission from Tabular Editor ApS.
+
+View the [terms](https://www.tabulareditor.com/terms) (section 5 in particular) for more information.
