@@ -411,7 +411,7 @@ Selected.Measure.Tokenize(includeHidden: false).Output();
 
 <img src="https://github.com/user-attachments/assets/5de466a1-4b84-4478-8ff2-bebc42e339df" width="75%">
 
-**Hint:** .NET does not have a built-in method for replacing a section of a string with another string, based on character positions. However, we can easily create our own utility method to do this. While we're at it, let's also add a similar method which takes a DaxToken as input, rather than the character index and length:
+**Hint:** .NET does not have a built-in method for replacing a section of a string with another string, based on character positions. However, we can easily create our own utility method to do this:
 
 ```csharp
 class Util {
@@ -424,11 +424,6 @@ class Util {
             throw new ArgumentOutOfRangeException("length");
 
         return original.Substring(0, startIndex) + replacement + original.Substring(startIndex + length);
-    }
-    
-    public static string Relace(string original, DaxToken token, string replacement)
-    {
-        return Replace(original, token.StartIndex, token.StopIndex - token.StartIndex + 1, replacement);
     }
 }
 
