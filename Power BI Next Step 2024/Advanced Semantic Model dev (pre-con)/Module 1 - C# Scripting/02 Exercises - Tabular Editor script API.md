@@ -95,10 +95,44 @@ Selected.Measures.Where(m => string.IsNullOrEmpty(m.Description) && m.IsVisible)
 ```
 
 </details>
-
 </details>
 <details>
-<summary><h3>Exercise 2.2 - Parameter table</h3></summary>
+<summary><h3>Exercise 2.2 - Formatting DAX</h3></summary>
+
+### 2.2a
+Write a script which will format the DAX of every single measure in the model. Bonus points for keeping it to a single line of code.
+
+<details><summary>Click to view solution</summary>
+
+```csharp
+Model.AllMeasures.FormatDax();
+```
+
+</details>
+
+### 2.2b
+Extend your solution to 2.2a so that it also includes the following object types:
+
+- Calculated Columns
+- Calculated Tables
+- Calculation Groups
+- Calculation Items
+
+<details><summary>Click to view solution</summary>
+
+```csharp
+Model.AllMeasures.FormatDax();
+Model.AllColumns.OfType<CalculatedColumn>().FormatDax();
+Model.Tables.OfType<CalculatedTable>().FormatDax();
+Model.CalculationGroups.FormatDax();
+Model.AllCalculationItems.FormatDax();
+```
+
+</details>
+  
+</details>
+<details>
+<summary><h3>Exercise 2.3 - Parameter table</h3></summary>
 
 A [parameter table](https://www.daxpatterns.com/parameter-table/) is a table that does not have any relationships to other tables in the model. Typically, the table only contains a single column. Any selection/filter made on the table, is observed in suitable DAX expressions within measures.
 
