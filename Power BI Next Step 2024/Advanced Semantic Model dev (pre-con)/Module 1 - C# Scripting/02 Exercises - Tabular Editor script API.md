@@ -1,5 +1,9 @@
 # Tabular Editor script API - exercises
 (Click on the section headers to expand/collapse)
+
+> [!Note]
+> As you may have realized by now, most of these exercises can be solved in many different ways. The solutions provided are just one way - so don't dispair if the solution you came up with doesn't match the suggested solutions. As long as your solution works ☺
+
 <details>
 <summary><h2>Introduction</h2></summary>
 
@@ -228,10 +232,6 @@ SWITCH(
 )
 ```
 
-After running the script, confirm everything works by refreshing the model (use Power BI Desktop or SSMS), and create a Matrix (in Power BI Desktop) or Pivot Table (in Excel), which slices [Dynamic Measure] by the [Value] column of the 'Measure Selection' table. You should see something like the following (depending on which measures you included in your selection when the script was executed):
-
-![image](https://github.com/user-attachments/assets/78a02fd6-94e6-4a1a-a9d1-0a2469c4e30f)
-
 <details><summary>Click to view solution</summary>
 
 ```csharp
@@ -240,6 +240,8 @@ if(Selected.Measures.Count == 0)
     Info("No measures selected!");
     return;
 }
+
+var table = Selected.Measures.First().Table;
 
 var calcTableDax = @"{{
 {0}
@@ -253,11 +255,158 @@ var switchMeasureDax = @"SWITCH(
 var calcTableInner = string.Join(",\r\n", Selected.Measures.Select(m => "    NAMEOF(" + m.DaxObjectName + ")"));
 var switchMeasureInner = string.Join(",\r\n", Selected.Measures.Select(m => "    NAMEOF(" + m.DaxObjectName + "), " + m.DaxObjectName));
 
-var table = Selected.Measures.First().Table;
+Model.AddCalculatedTable("Measure Selection", string.Format(calcTableDax, calcTableInner));
+table.AddMeasure("Dynamic Measure", string.Format(switchMeasureDax, switchMeasureInner));
+```
+
+</details>
+
+**Bonus:** Instead of putting the [Dynamic Measure] on the same table as the selected measures, let's ask the user nicely which table they want the [Dynamic Measure] to be created in. Modify the script so the users are prompted to select a table. If the user cancels the prompt, nothing should happen.
+
+<details><summary>Click to view solution</summary>
+
+```csharp
+if(Selected.Measures.Count == 0)
+{
+    Info("No measures selected!");
+    return;
+}
+
+var table = SelectTable(preselect: Selected.Measures.First().Table, label: "Which table should the Dynamic Measure be added to?");
+if(table == null) return;
+
+var calcTableDax = @"{{
+{0}
+}}";
+var switchMeasureDax = @"SWITCH(
+    SELECTEDVALUE('Measure Selection'[Value]),
+{0},
+    ""Please make a selection on the 'Measure Selection' table""
+)";
+
+var calcTableInner = string.Join(",\r\n", Selected.Measures.Select(m => "    NAMEOF(" + m.DaxObjectName + ")"));
+var switchMeasureInner = string.Join(",\r\n", Selected.Measures.Select(m => "    NAMEOF(" + m.DaxObjectName + "), " + m.DaxObjectName));
 
 Model.AddCalculatedTable("Measure Selection", string.Format(calcTableDax, calcTableInner));
 table.AddMeasure("Dynamic Measure", string.Format(switchMeasureDax, switchMeasureInner));
 ```
 
 </details>
+
+After running the script, confirm everything works by refreshing the model (use Power BI Desktop or SSMS), and create a Matrix (in Power BI Desktop) or Pivot Table (in Excel), which slices [Dynamic Measure] by the [Value] column of the 'Measure Selection' table. You should see something like the following (depending on which measures you included in your selection when the script was executed):
+
+<img src="https://github.com/user-attachments/assets/78a02fd6-94e6-4a1a-a9d1-0a2469c4e30f" width="50%">
+
+</details>
+<details>
+<summary><h3>Exercise 2.5 - Data-driven metadata generation</h3></summary>
+
+Sometimes it is useful to have measures which apply filters in DAX, corresponding to members of a dimension table. For example, in the [SpaceParts](https://github.com/otykier/training/tree/main/Sample%20models) sample models, we have a table called `'Invoice Document Type'` containing one row for each type of invoice in the model. Currently, there are 5 different types.
+
+Let's write a script which automatically generates one measure for each Invoice Document Type. 
+
+The measure name should be `xxx Invoice Value` where `xxx` is the value from the [Text] column of the 'Invoice Document Type' table.
+
+The measure expression should look like:
+
+```dax
+CALCULATE(
+    [Total Net Invoice Value],
+    'Invoice Document Type'[Code] = "yyy"
+)
+```
+
+where `yyy` is the value from the [Code] column of the 'Invoice Document Type' table.
+
+<details><summary>Click to view solution</summary>
+
+**Note:** This script assumes the model contains a table named 'Invoice Document Type' which has a [Code] column and a [Text] column. You'll get a runtime error otherwise, since the DAX query that we execute to read the values from the table will not work.
+
+We provide two solutions here, to illustrate the difference between the `ExecuteReader` (which returns an [IDataReader](https://learn.microsoft.com/en-us/dotnet/api/system.data.idatareader?view=net-8.0)) and the `EvaluateDax` (which returns a [DataTable](https://learn.microsoft.com/en-us/dotnet/api/system.data.datatable?view=net-8.0) in this case) approaches.
+
+**Using ExecuteReader:**
+```csharp
+var name = "{0} Invoice Value";
+var dax = @"CALCULATE(
+    [Total Net Invoice Value],
+    'Invoice Document Type'[Code] = ""{0}""
+)";
+
+var reader = ExecuteReader("EVALUATE SELECTCOLUMNS('Invoice Document Type', [Code], [Text])");
+
+while(reader.Read())
+{
+    var code = reader.GetString(0);
+    var text = reader.GetString(1);
+ 
+    Model.Tables["Invoice Document Type"].AddMeasure(
+        string.Format(name, text),
+        string.Format(dax, code)
+    );
+}
+```
+
+**Using EvaluateDax:**
+```csharp
+using System.Data;
+
+var name = "{0} Invoice Value";
+var dax = @"CALCULATE(
+    [Total Net Invoice Value],
+    'Invoice Document Type'[Code] = ""{0}""
+)";
+
+var data = EvaluateDax("SELECTCOLUMNS('Invoice Document Type', [Code], [Text])") as DataTable;
+// Uncomment the line below if you want to see the data returned from the query above:
+// data.Output();
+
+foreach(DataRow row in data.Rows)
+{
+    var code = row[0].ToString();
+    var text = row[1].ToString();
+ 
+    Model.Tables["Invoice Document Type"].AddMeasure(
+        string.Format(name, text),
+        string.Format(dax, code)
+    );
+}
+```
+
+</details>
+</details>
+<details>
+<summary><h3>Exercise 2.6 - (Advanced) The Tokenizer</h3></summary>
+
+Let's explore the [`Tokenize()`](https://docs.tabulareditor.com/api/TabularEditor.TOMWrapper.Utils.DaxDependencyHelper.html#TabularEditor_TOMWrapper_Utils_DaxDependencyHelper_Tokenize_TabularEditor_TOMWrapper_IDaxDependantObject_) method.
+
+For manipulating DAX expressions, it is often easier to work with a list of tokens, rather than a string of characters. For example, if we wanted to detect all occurrences of `/` (the [division operator](https://dax.guide/op/division/)) in our DAX expressions, we could do a simple token search like so:
+
+```csharp
+var usesDivision = Model.AllMeasures.Where(m => m.Tokenize().Any(t => t.Type == DaxToken.DIV)).ToList();
+// Output the list of measures that use division:
+usesDivision.Output();
+```
+
+Without tokenization, this would be much harder to do, because we cannot easily distinguish between the character '/' being used as a division operator, or simply being part of an object name, a string or a comment. RegEx ain't got nothing on Tokenization.
+
+View the [full list of DaxTokens available in the TE2 tokenizer](https://github.com/TabularEditor/TabularEditor/blob/master/TOMWrapper/Utils/DaxToken.Generated.cs).
+
+Now for the exercise. Some guy with an italian accent, has told you that `SUM('Table'[Column])` is just syntax sugar for `SUMX('Table', 'Table'[Column])`. Health experts say that sugar is bad for you, so naturally you want to change all occurrences of `SUM` in your measures, to the equivalent `SUMX`.
+
+**Write a script which will use the tokenizer to detect all occurrences of `DaxToken.SUM` in the DAX expressions on your measures.**
+
+**Hint:** If we ignore whitespace and comments, and assume that the column reference is always qualified with the table name, the token sequence would always look something like this:
+
+1. `DaxToken.SUM`
+2. `DaxToken.OPEN_PARENS`
+3. `DaxToken.TABLE` (when the table name is enclosed in single quotes `'`) or `DaxToken.TABLE_OR_VARIABLE` (when the table name is unquoted)
+4. `DaxToken.COLUMN_OR_MEASURE`
+5. `DaxToken.CLOSE_PARENS`
+
+**Hint:** Use the `Output()` method to view the list of tokens produced by the `Tokenize()` method.
+
+<img src="https://github.com/user-attachments/assets/5de466a1-4b84-4478-8ff2-bebc42e339df" width="75%">
+
+**Hint:** .NET does not have a built-in method for replacing a section of a string with another string, based on character positions. However, we can easily create our own utility method to do this:
+
 </details>
