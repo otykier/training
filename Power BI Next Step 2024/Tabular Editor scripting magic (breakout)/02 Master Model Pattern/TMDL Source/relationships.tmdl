@@ -1,0 +1,114 @@
+relationship 2c5177ff-b673-48e0-9168-821672c57e5e
+	fromColumn: Customer.GeographyKey
+	toColumn: Geography.GeographyKey
+
+relationship e278ab89-4b93-42e3-b40c-636fdd8d681c
+	isActive: false
+	fromColumn: Employee.SalesTerritoryKey
+	toColumn: 'Sales Territory'.SalesTerritoryKey
+
+relationship 27dae602-f0b8-43f8-940b-43fb315458bb
+	isActive: false
+	fromColumn: Geography.SalesTerritoryKey
+	toColumn: 'Sales Territory'.SalesTerritoryKey
+
+relationship 9b8024a2-e51d-4a2b-9a8f-6a2199d1d2ea
+	fromColumn: Product.ProductSubcategoryKey
+	toColumn: 'Product Subcategory'.ProductSubcategoryKey
+
+relationship 46425cb9-382b-4dfb-9b79-63bc5082c42b
+	fromColumn: 'Product Subcategory'.ProductCategoryKey
+	toColumn: 'Product Category'.ProductCategoryKey
+
+relationship b32d6ef8-a309-4c10-8d36-0f0e2ae84901
+	fromColumn: Reseller.GeographyKey
+	toColumn: Geography.GeographyKey
+
+relationship 877c4e4a-6f61-43c8-ae8b-b748a6400407
+	fromColumn: 'Internet Sales'.CurrencyKey
+	toColumn: Currency.CurrencyKey
+
+relationship 90d94b82-0243-4632-b9f7-99de63279961
+	fromColumn: 'Internet Sales'.CustomerKey
+	toColumn: Customer.CustomerKey
+
+relationship 3db0e485-88a9-44d9-9a12-657c8ef0f881
+	fromColumn: 'Internet Sales'.OrderDateKey
+	toColumn: Date.DateKey
+
+relationship f5617b1d-9840-4978-8860-f337cb5f852d
+	isActive: false
+	fromColumn: 'Internet Sales'.DueDateKey
+	toColumn: Date.DateKey
+
+relationship 8cd93710-86b7-47a6-b512-230bc4c3e73d
+	isActive: false
+	fromColumn: 'Internet Sales'.ShipDateKey
+	toColumn: Date.DateKey
+
+relationship a5016faf-9af5-4750-92ff-505d05aefe68
+	fromColumn: 'Internet Sales'.ProductKey
+	toColumn: Product.ProductKey
+
+relationship b3d9edf1-1e10-436b-b870-80029b0ee4f3
+	fromColumn: 'Internet Sales'.PromotionKey
+	toColumn: Promotion.PromotionKey
+
+relationship d9761f6e-1fec-476d-9eee-9e1511044619
+	fromColumn: 'Internet Sales'.SalesTerritoryKey
+	toColumn: 'Sales Territory'.SalesTerritoryKey
+
+relationship 602b2378-4717-4122-b97e-95f36c15dc85
+	fromColumn: 'Product Inventory'.DateKey
+	toColumn: Date.DateKey
+
+relationship 7dbfc7d9-a935-432d-b5c6-a53d129fbd16
+	fromColumn: 'Product Inventory'.ProductKey
+	toColumn: Product.ProductKey
+
+relationship 1b277ca4-d6fc-4366-b164-2fd3c56cfd24
+	fromColumn: 'Reseller Sales'.CurrencyKey
+	toColumn: Currency.CurrencyKey
+
+relationship 100ca454-655f-4e46-a040-cfa2ca981f88
+	fromColumn: 'Reseller Sales'.OrderDateKey
+	toColumn: Date.DateKey
+
+relationship 1f6426cb-30d0-4d70-bbd5-5da59ce7292b
+	isActive: false
+	fromColumn: 'Reseller Sales'.DueDateKey
+	toColumn: Date.DateKey
+
+relationship 1c37fcb7-a454-4b11-8389-9a97d5d09f4c
+	isActive: false
+	fromColumn: 'Reseller Sales'.ShipDateKey
+	toColumn: Date.DateKey
+
+relationship 262def50-5047-491a-8fc6-e96a9d66a80b
+	fromColumn: 'Reseller Sales'.EmployeeKey
+	toColumn: Employee.EmployeeKey
+
+relationship adbcdd01-4156-4b47-9c94-5f6283c9c20a
+	fromColumn: 'Reseller Sales'.ProductKey
+	toColumn: Product.ProductKey
+
+relationship 03b67804-b82a-433a-9589-f768a6eb3945
+	fromColumn: 'Reseller Sales'.PromotionKey
+	toColumn: Promotion.PromotionKey
+
+relationship 431b1361-7b09-4540-91d3-fda884108451
+	fromColumn: 'Reseller Sales'.ResellerKey
+	toColumn: Reseller.ResellerKey
+
+relationship b62a7abc-f954-41a1-ac0a-bce7fdd5eaa7
+	fromColumn: 'Reseller Sales'.SalesTerritoryKey
+	toColumn: 'Sales Territory'.SalesTerritoryKey
+
+relationship 39981e17-197f-4647-a8d8-850cbe2aea09
+	fromColumn: 'Sales Quota'.DateKey
+	toColumn: Date.DateKey
+
+relationship d96cf292-44da-4a47-837c-173bf1f49c18
+	fromColumn: 'Sales Quota'.EmployeeKey
+	toColumn: Employee.EmployeeKey
+

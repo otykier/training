@@ -1,0 +1,29 @@
+table 'Product Category'
+
+	column ProductCategoryKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ProductCategoryKey
+
+	column 'Product Category Name'
+		dataType: string
+		sourceColumn: EnglishProductCategoryName
+
+	partition 'Product Category' = query
+		source
+			query = SELECT [dbo].[DimProductCategory].* 		FROM [dbo].[DimProductCategory]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimProductCategory
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimProductCategory].*   FROM [dbo].[DimProductCategory] 
+			```
+

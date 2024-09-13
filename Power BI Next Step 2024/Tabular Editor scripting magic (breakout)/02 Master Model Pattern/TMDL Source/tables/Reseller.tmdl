@@ -1,0 +1,116 @@
+table Reseller
+
+	column ResellerKey
+		dataType: int64
+		isHidden
+		sourceColumn: ResellerKey
+
+	column GeographyKey
+		dataType: int64
+		isHidden
+		sourceColumn: GeographyKey
+
+	column 'Reseller Id'
+		dataType: string
+		sourceColumn: ResellerAlternateKey
+
+	column 'Reseller Phone'
+		dataType: string
+		sourceColumn: Phone
+
+	column 'Business Type'
+		dataType: string
+		sourceColumn: BusinessType
+
+	column 'Reseller Name'
+		dataType: string
+		isDefaultLabel
+		sourceColumn: ResellerName
+
+	column 'Number Employees'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: NumberEmployees
+
+	column 'Order Frequency'
+		dataType: string
+		sourceColumn: OrderFrequency
+
+	column 'Order Month'
+		dataType: int64
+		sourceColumn: OrderMonth
+
+	column 'First Order Year'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: FirstOrderYear
+
+	column 'Last Order Year'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: LastOrderYear
+
+	column 'Product Line'
+		dataType: string
+		sourceColumn: ProductLine
+
+	column 'Address Line 1'
+		dataType: string
+		sourceColumn: AddressLine1
+
+	column 'Address Line 2'
+		dataType: string
+		sourceColumn: AddressLine2
+
+	column 'Annual Sales'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: AnnualSales
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Bank Name'
+		dataType: string
+		sourceColumn: BankName
+
+	column 'Min Payment Type'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: MinPaymentType
+
+	column 'Min Payment Amount'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: MinPaymentAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Annua Revenue'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: AnnualRevenue
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Year Opened'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: YearOpened
+
+	partition Reseller = query
+		source
+			query = SELECT [dbo].[DimReseller].* 		FROM [dbo].[DimReseller]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimReseller
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimReseller].*   FROM [dbo].[DimReseller] 
+			```
+

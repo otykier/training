@@ -1,0 +1,35 @@
+table 'Product Subcategory'
+
+	column ProductSubcategoryKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ProductSubcategoryKey
+
+	column 'Product Subcategory Name'
+		dataType: string
+		sourceColumn: EnglishProductSubcategoryName
+
+	column ProductCategoryKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ProductCategoryKey
+
+	partition 'Product Subcategory' = query
+		source
+			query = SELECT [dbo].[DimProductSubcategory].* 		FROM [dbo].[DimProductSubcategory]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimProductSubcategory
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimProductSubcategory].*   FROM [dbo].[DimProductSubcategory] 
+			```
+

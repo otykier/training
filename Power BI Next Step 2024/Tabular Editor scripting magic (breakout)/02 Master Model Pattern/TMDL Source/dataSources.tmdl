@@ -1,0 +1,6 @@
+dataSource 'SqlServer localhost' = provider
+	connectionString: provider=MSOLEDBSQL.1;integrated security=SSPI;persist security info=False;initial catalog=AdventureWorksDW2019;data source=localhost
+	impersonationMode: impersonateServiceAccount
+
+	annotation ConnectionEditUISource = SqlServer
+

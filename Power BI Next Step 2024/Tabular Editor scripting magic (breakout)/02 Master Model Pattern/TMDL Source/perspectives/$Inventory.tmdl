@@ -1,0 +1,168 @@
+perspective $Inventory
+
+	perspectiveTable 'Product Inventory'
+
+		perspectiveMeasure 'Total Inventory Value Performance'
+
+		perspectiveMeasure 'Total Units Out'
+
+		perspectiveMeasure 'Total Units'
+
+		perspectiveMeasure 'Total Units Movement'
+
+		perspectiveMeasure 'Products with Negative Stock'
+
+		perspectiveMeasure 'Products UnderStocked'
+
+		perspectiveMeasure 'Total Inventory Value'
+
+		perspectiveMeasure 'Total Units In'
+
+		perspectiveMeasure 'Total Inventory Maximum Value'
+
+		perspectiveMeasure 'Total Inventory Optimal Value'
+
+		perspectiveMeasure 'Products OverStocked'
+
+		perspectiveColumn 'Units In'
+
+		perspectiveColumn 'Product-Date OverStocked'
+
+		perspectiveColumn 'Units Balance'
+
+		perspectiveColumn 'Product-Date Negative Stock'
+
+		perspectiveColumn 'Unit Cost'
+
+		perspectiveColumn DateKey
+
+		perspectiveColumn 'Product-Date Inventory Value'
+
+		perspectiveColumn 'Movement Date'
+
+		perspectiveColumn 'Product-Date UnderStocked'
+
+		perspectiveColumn 'Units Out'
+
+		perspectiveColumn ProductKey
+
+		perspectiveColumn 'Product-Date Optimal Inventory Value'
+
+		perspectiveColumn 'Product-Date Max Inventory Value'
+
+	perspectiveTable Date
+
+		perspectiveMeasure 'Days In Current Quarter to Date'
+
+		perspectiveMeasure 'Days In Current Quarter'
+
+		perspectiveColumn 'Month Name'
+
+		perspectiveColumn 'Calendar Quarter'
+
+		perspectiveColumn Month
+
+		perspectiveColumn 'Week Of Year'
+
+		perspectiveColumn 'Calendar Year'
+
+		perspectiveColumn 'Fiscal Quarter'
+
+		perspectiveColumn 'Day Of Month'
+
+		perspectiveColumn 'Fiscal Year'
+
+		perspectiveColumn 'Day Name Of Week'
+
+		perspectiveColumn 'Day Of Year'
+
+		perspectiveColumn DateKey
+
+		perspectiveColumn Date
+
+		perspectiveColumn 'Fiscal Semester'
+
+		perspectiveColumn 'Day Number Of Week'
+
+		perspectiveColumn 'Calendar Semester'
+
+		perspectiveHierarchy Calendar
+
+		perspectiveHierarchy 'Production Calendar'
+
+		perspectiveHierarchy Fiscal
+
+	perspectiveTable Product
+
+		perspectiveColumn 'Product SubCategory Name'
+
+		perspectiveColumn Style
+
+		perspectiveColumn 'Model Name'
+
+		perspectiveColumn 'Product Name'
+
+		perspectiveColumn 'Product Start Date'
+
+		perspectiveColumn 'Weight Unit Code'
+
+		perspectiveColumn 'Safety Stock Level'
+
+		perspectiveColumn 'Product Id'
+
+		perspectiveColumn 'Standard Cost'
+
+		perspectiveColumn Color
+
+		perspectiveColumn 'Days To Manufacture'
+
+		perspectiveColumn 'Dealer Price'
+
+		perspectiveColumn ProductKey
+
+		perspectiveColumn LargePhoto
+
+		perspectiveColumn Size
+
+		perspectiveColumn 'Is Finished Goods'
+
+		perspectiveColumn Description
+
+		perspectiveColumn 'Product Line'
+
+		perspectiveColumn 'Size Unit Code'
+
+		perspectiveColumn 'List Price'
+
+		perspectiveColumn Class
+
+		perspectiveColumn 'Size Range'
+
+		perspectiveColumn 'Reorder Point'
+
+		perspectiveColumn 'Product Status'
+
+		perspectiveColumn Weight
+
+		perspectiveColumn ProductSubcategoryKey
+
+		perspectiveColumn 'Product Category Name'
+
+		perspectiveColumn 'Product End Date'
+
+		perspectiveHierarchy Category
+
+	perspectiveTable 'Product Subcategory'
+
+		perspectiveColumn 'Product Subcategory Name'
+
+		perspectiveColumn ProductSubcategoryKey
+
+		perspectiveColumn ProductCategoryKey
+
+	perspectiveTable 'Product Category'
+
+		perspectiveColumn 'Product Category Name'
+
+		perspectiveColumn ProductCategoryKey
+

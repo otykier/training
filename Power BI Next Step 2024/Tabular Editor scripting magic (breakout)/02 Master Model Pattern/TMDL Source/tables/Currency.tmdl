@@ -1,0 +1,32 @@
+table Currency
+
+	column CurrencyKey
+		dataType: int64
+		isHidden
+		sourceColumn: CurrencyKey
+
+	column 'Currency Code'
+		dataType: string
+		sourceColumn: CurrencyAlternateKey
+
+	column CurrencyName
+		dataType: string
+		sourceColumn: CurrencyName
+
+	partition Currency = query
+		source
+			query = SELECT [dbo].[DimCurrency].* 		FROM [dbo].[DimCurrency]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimCurrency
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimCurrency].*   FROM [dbo].[DimCurrency] 
+			```
+

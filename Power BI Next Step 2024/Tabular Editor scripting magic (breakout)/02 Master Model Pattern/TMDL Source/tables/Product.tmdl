@@ -1,0 +1,163 @@
+table Product
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		sourceColumn: ProductKey
+
+	column 'Product Id'
+		dataType: string
+		sourceColumn: ProductAlternateKey
+
+	column ProductSubcategoryKey
+		dataType: int64
+		isHidden
+		sourceColumn: ProductSubcategoryKey
+
+	column 'Weight Unit Code'
+		dataType: string
+		sourceColumn: WeightUnitMeasureCode
+
+	column 'Size Unit Code'
+		dataType: string
+		sourceColumn: SizeUnitMeasureCode
+
+	column 'Product Name'
+		dataType: string
+		isDefaultLabel
+		sourceColumn: EnglishProductName
+
+	column 'Standard Cost'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: StandardCost
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Is Finished Goods'
+		dataType: boolean
+		sourceColumn: FinishedGoodsFlag
+
+	column Color
+		dataType: string
+		sourceColumn: Color
+
+	column 'Safety Stock Level'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SafetyStockLevel
+
+	column 'Reorder Point'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ReorderPoint
+
+	column 'List Price'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: ListPrice
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column Size
+		dataType: string
+		sourceColumn: Size
+
+	column 'Size Range'
+		dataType: string
+		sourceColumn: SizeRange
+
+	column Weight
+		dataType: double
+		summarizeBy: none
+		sourceColumn: Weight
+
+	column 'Days To Manufacture'
+		dataType: int64
+		sourceColumn: DaysToManufacture
+
+	column 'Product Line'
+		dataType: string
+		sourceColumn: ProductLine
+
+	column 'Dealer Price'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: DealerPrice
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column Class
+		dataType: string
+		sourceColumn: Class
+
+	column Style
+		dataType: string
+		sourceColumn: Style
+
+	column 'Model Name'
+		dataType: string
+		sourceColumn: ModelName
+
+	column LargePhoto
+		dataType: binary
+		isDefaultImage
+		sourceColumn: LargePhoto
+
+	column Description
+		dataType: string
+		sourceColumn: EnglishDescription
+
+	column 'Product Start Date'
+		dataType: dateTime
+		sourceColumn: StartDate
+
+	column 'Product End Date'
+		dataType: dateTime
+		sourceColumn: EndDate
+
+	column 'Product Status'
+		dataType: string
+		sourceColumn: Status
+
+	column 'Product SubCategory Name' = RELATED( 'Product Subcategory'[Product Subcategory Name] )
+		dataType: string
+		isDataTypeInferred
+
+	column 'Product Category Name' = RELATED( 'Product Category'[Product Category Name] )
+		dataType: string
+		isDataTypeInferred
+
+	hierarchy Category
+
+		level Category
+			column: 'Product Category Name'
+
+		level SubCategory
+			column: 'Product SubCategory Name'
+
+		level Model
+			column: 'Model Name'
+
+		level Product
+			column: 'Product Name'
+
+	partition Product = query
+		source
+			query = SELECT [dbo].[DimProduct].* 		FROM [dbo].[DimProduct]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimProduct
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimProduct].*   FROM [dbo].[DimProduct] 
+			```
+
+	annotation TabularProcessingBatch_test = 1
+

@@ -1,0 +1,358 @@
+perspective '$Internet Operation'
+
+	perspectiveTable Date
+
+		perspectiveMeasure 'Days In Current Quarter to Date'
+
+		perspectiveMeasure 'Days In Current Quarter'
+
+		perspectiveColumn 'Month Name'
+
+		perspectiveColumn 'Calendar Quarter'
+
+		perspectiveColumn Month
+
+		perspectiveColumn 'Week Of Year'
+
+		perspectiveColumn 'Calendar Year'
+
+		perspectiveColumn 'Fiscal Quarter'
+
+		perspectiveColumn 'Day Of Month'
+
+		perspectiveColumn 'Fiscal Year'
+
+		perspectiveColumn 'Day Name Of Week'
+
+		perspectiveColumn 'Day Of Year'
+
+		perspectiveColumn DateKey
+
+		perspectiveColumn Date
+
+		perspectiveColumn 'Fiscal Semester'
+
+		perspectiveColumn 'Day Number Of Week'
+
+		perspectiveColumn 'Calendar Semester'
+
+		perspectiveHierarchy Calendar
+
+		perspectiveHierarchy 'Production Calendar'
+
+		perspectiveHierarchy Fiscal
+
+	perspectiveTable 'Internet Sales'
+
+		perspectiveMeasure 'Internet Total Gross Profit'
+
+		perspectiveMeasure 'Internet Previous Quarter Sales Proportion to QTD'
+
+		perspectiveMeasure 'Internet Current Quarter Gross Profit Performance'
+
+		perspectiveMeasure 'Internet Current Quarter Sales'
+
+		perspectiveMeasure 'Internet Current Quarter Sales Performance'
+
+		perspectiveMeasure 'Internet Total Product Cost'
+
+		perspectiveMeasure 'Internet Distinct Count Sales Order'
+
+		perspectiveMeasure 'Internet Previous Quarter Gross Profit'
+
+		perspectiveMeasure 'Internet Previous Quarter Gross Profit Proportion to QTD'
+
+		perspectiveMeasure 'Internet Order Lines Count'
+
+		perspectiveMeasure 'Internet Previous Quarter Sales'
+
+		perspectiveMeasure 'Internet Total Freight'
+
+		perspectiveMeasure 'Internet Total Tax Amount'
+
+		perspectiveMeasure 'Internet Current Quarter Gross Profit'
+
+		perspectiveMeasure 'Internet Total Discount Amount'
+
+		perspectiveMeasure 'Internet Total Sales'
+
+		perspectiveMeasure 'Internet Total Units'
+
+		perspectiveColumn 'Carrier Tracking Number'
+
+		perspectiveColumn 'Order Date'
+
+		perspectiveColumn 'Sales Order Line Number'
+
+		perspectiveColumn CustomerKey
+
+		perspectiveColumn 'Gross Profit'
+
+		perspectiveColumn 'Due Date'
+
+		perspectiveColumn 'Sales Order Number'
+
+		perspectiveColumn 'Discount Amount'
+
+		perspectiveColumn 'Sales Amount'
+
+		perspectiveColumn PromotionKey
+
+		perspectiveColumn 'Customer PO Number'
+
+		perspectiveColumn ProductKey
+
+		perspectiveColumn 'Unit Price'
+
+		perspectiveColumn Freight
+
+		perspectiveColumn 'Total Product Cost'
+
+		perspectiveColumn CurrencyKey
+
+		perspectiveColumn ShipDateKey
+
+		perspectiveColumn 'Product Standard Cost'
+
+		perspectiveColumn 'Extended Amount'
+
+		perspectiveColumn 'Order Quantity'
+
+		perspectiveColumn 'Revision Number'
+
+		perspectiveColumn SalesTerritoryKey
+
+		perspectiveColumn 'Tax Amount'
+
+		perspectiveColumn OrderDateKey
+
+		perspectiveColumn 'Unit Price Discount Pct'
+
+		perspectiveColumn 'Ship Date'
+
+		perspectiveColumn DueDateKey
+
+	perspectiveTable 'Sales Territory'
+
+		perspectiveMeasure 'Total Gross Profit'
+
+		perspectiveMeasure 'Distinct Count Sales Orders'
+
+		perspectiveMeasure 'Total Sales - Sales Territory sliced by Employee'
+
+		perspectiveMeasure 'Total Current Quarter Sales'
+
+		perspectiveMeasure 'Total Previous Quarter Sales'
+
+		perspectiveMeasure 'Total Tax Amount'
+
+		perspectiveMeasure 'Total Current Quarter Sales Performance'
+
+		perspectiveMeasure 'Total Freight'
+
+		perspectiveMeasure 'Total Sales'
+
+		perspectiveMeasure 'Total Previous Quarter Gross Profit Proportion to QTD'
+
+		perspectiveMeasure 'Order Lines Count'
+
+		perspectiveMeasure 'Total Discount Amount'
+
+		perspectiveMeasure 'Total Previous Quarter Sales Proportion to QTD'
+
+		perspectiveMeasure 'Total Products Cost'
+
+		perspectiveMeasure 'Total Units Sold'
+
+		perspectiveMeasure 'Total Current Quarter Gross Profit Performance'
+
+		perspectiveMeasure 'Total Current Quarter Gross Profit'
+
+		perspectiveMeasure 'Total Previous Quarter Gross Profit'
+
+		perspectiveColumn 'Sales Territory Region'
+
+		perspectiveColumn SalesTerritoryKey
+
+		perspectiveColumn 'Sales Territory Country'
+
+		perspectiveColumn 'Sales Territory Group'
+
+		perspectiveColumn 'Sales Territory Image'
+
+		perspectiveHierarchy Territory
+
+	perspectiveTable Product
+
+		perspectiveColumn 'Product SubCategory Name'
+
+		perspectiveColumn Style
+
+		perspectiveColumn 'Model Name'
+
+		perspectiveColumn 'Product Name'
+
+		perspectiveColumn 'Product Start Date'
+
+		perspectiveColumn 'Weight Unit Code'
+
+		perspectiveColumn 'Safety Stock Level'
+
+		perspectiveColumn 'Product Id'
+
+		perspectiveColumn 'Standard Cost'
+
+		perspectiveColumn Color
+
+		perspectiveColumn 'Days To Manufacture'
+
+		perspectiveColumn 'Dealer Price'
+
+		perspectiveColumn ProductKey
+
+		perspectiveColumn LargePhoto
+
+		perspectiveColumn Size
+
+		perspectiveColumn 'Is Finished Goods'
+
+		perspectiveColumn Description
+
+		perspectiveColumn 'Product Line'
+
+		perspectiveColumn 'Size Unit Code'
+
+		perspectiveColumn 'List Price'
+
+		perspectiveColumn Class
+
+		perspectiveColumn 'Size Range'
+
+		perspectiveColumn 'Reorder Point'
+
+		perspectiveColumn 'Product Status'
+
+		perspectiveColumn Weight
+
+		perspectiveColumn ProductSubcategoryKey
+
+		perspectiveColumn 'Product Category Name'
+
+		perspectiveColumn 'Product End Date'
+
+		perspectiveHierarchy Category
+
+	perspectiveTable Promotion
+
+		perspectiveColumn 'Promotion Name'
+
+		perspectiveColumn 'Max Quantity'
+
+		perspectiveColumn 'Promotion Type'
+
+		perspectiveColumn 'Promotion Start Date'
+
+		perspectiveColumn 'Min Quantity'
+
+		perspectiveColumn 'Promotion Category'
+
+		perspectiveColumn DiscountPct
+
+		perspectiveColumn PromotionKey
+
+		perspectiveColumn 'Promotion End Date'
+
+	perspectiveTable 'Product Subcategory'
+
+		perspectiveColumn 'Product Subcategory Name'
+
+		perspectiveColumn ProductSubcategoryKey
+
+		perspectiveColumn ProductCategoryKey
+
+	perspectiveTable Geography
+
+		perspectiveColumn City
+
+		perspectiveColumn 'State Province Name'
+
+		perspectiveColumn 'Country Region Code'
+
+		perspectiveColumn 'State Province Code'
+
+		perspectiveColumn SalesTerritoryKey
+
+		perspectiveColumn GeographyKey
+
+		perspectiveColumn 'Country Region Name'
+
+		perspectiveColumn 'Postal Code'
+
+		perspectiveHierarchy Geography
+
+	perspectiveTable Customer
+
+		perspectiveColumn CustomerKey
+
+		perspectiveColumn 'Number of Children At Home'
+
+		perspectiveColumn 'Middle Name'
+
+		perspectiveColumn 'Name Style'
+
+		perspectiveColumn 'Date Of First Purchase'
+
+		perspectiveColumn 'Address Line 2'
+
+		perspectiveColumn GeographyKey
+
+		perspectiveColumn 'Yearly Income'
+
+		perspectiveColumn 'Marital Status'
+
+		perspectiveColumn Phone
+
+		perspectiveColumn 'Email Address'
+
+		perspectiveColumn Gender
+
+		perspectiveColumn Occupation
+
+		perspectiveColumn 'Address Line 1'
+
+		perspectiveColumn 'Total Cars Owned'
+
+		perspectiveColumn 'Total Children'
+
+		perspectiveColumn Suffix
+
+		perspectiveColumn 'First Name'
+
+		perspectiveColumn 'Birth Date'
+
+		perspectiveColumn Education
+
+		perspectiveColumn 'Last Name'
+
+		perspectiveColumn 'Commute Distance'
+
+		perspectiveColumn 'Customer Id'
+
+		perspectiveColumn Title
+
+		perspectiveColumn 'Owns House'
+
+	perspectiveTable Currency
+
+		perspectiveColumn CurrencyKey
+
+		perspectiveColumn 'Currency Code'
+
+		perspectiveColumn CurrencyName
+
+	perspectiveTable 'Product Category'
+
+		perspectiveColumn 'Product Category Name'
+
+		perspectiveColumn ProductCategoryKey
+

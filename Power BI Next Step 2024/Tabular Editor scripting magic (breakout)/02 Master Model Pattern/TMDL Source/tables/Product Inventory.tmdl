@@ -1,0 +1,1332 @@
+table 'Product Inventory'
+
+	measure 'Total Units In' = SUM( 'Product Inventory'[Units In] )
+		dataType: int64
+		formatString: #,0
+
+	measure 'Total Units Out' = SUM( 'Product Inventory'[Units Out] )
+		dataType: int64
+		formatString: #,0
+
+	measure 'Total Units Movement' = [Total Units In] - [Total Units Out]
+		dataType: int64
+		formatString: #,0
+
+	measure 'Total Units' = CALCULATE( SUM( 'Product Inventory'[Units Balance] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+		dataType: int64
+		formatString: #,0
+
+	measure 'Total Inventory Value' = CALCULATE( SUM( 'Product Inventory'[Product-Date Inventory Value] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Inventory Optimal Value' =
+			CALCULATE(
+			    SUM( 'Product Inventory'[Product-Date Optimal Inventory Value] ),
+			    LASTDATE( 'Product Inventory'[Movement Date] )
+			)
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Inventory Maximum Value' =
+			CALCULATE(
+			    SUM( 'Product Inventory'[Product-Date Max Inventory Value] ),
+			    LASTDATE( 'Product Inventory'[Movement Date] )
+			)
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Inventory Value Performance' =
+			IF(
+			    [Total Inventory Value] < [Total Inventory Optimal Value],
+			    -( 1 - ( [Total Inventory Value] / [Total Inventory Optimal Value] ) ),
+			    ( [Total Inventory Value] - [Total Inventory Optimal Value] )
+			        / ( [Total Inventory Maximum Value] - [Total Inventory Optimal Value] )
+			)
+		dataType: double
+
+		kpi
+			targetExpression = 0
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Total Inventory Value Performance] ),
+				    BLANK( ),
+				    IF(
+				        [Total Inventory Value Performance] < 0,
+				        IF( [Total Inventory Value Performance] < -0.2, -1, 0 ),
+				        IF( [Total Inventory Value Performance] < 0.6, 1, IF( [Total Inventory Value Performance] < 1, 0, -1 ) )
+				    )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Centered
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 4
+
+			annotation KpiThreshold_0 = -0.2
+
+			annotation KpiThreshold_1 = 0
+
+			annotation KpiThreshold_2 = 0.6
+
+			annotation KpiThreshold_3 = 1
+
+	measure 'Products OverStocked' = CALCULATE( SUM( 'Product Inventory'[Product-Date OverStocked] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+		dataType: int64
+
+		kpi
+			targetExpression = 0
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Products OverStocked] ),
+				    BLANK( ),
+				    IF( [Products OverStocked] < 1, 1, IF( [Products OverStocked] < 5, 0, -1 ) )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = LinearReversed
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 1
+
+			annotation KpiThreshold_1 = 5
+
+	measure 'Products UnderStocked' = CALCULATE( SUM( 'Product Inventory'[Product-Date UnderStocked] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+		dataType: int64
+
+		kpi
+			targetExpression = 0
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Products UnderStocked] ),
+				    BLANK( ),
+				    IF( [Products UnderStocked] < 5, 1, IF( [Products UnderStocked] < 15, 0, -1 ) )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = LinearReversed
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 5
+
+			annotation KpiThreshold_1 = 15
+
+	measure 'Products with Negative Stock' = CALCULATE( SUM( 'Product Inventory'[Product-Date Negative Stock] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+		dataType: int64
+
+		kpi
+			targetExpression = 0
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Products with Negative Stock] ),
+				    BLANK( ),
+				    IF( [Products with Negative Stock] < 0.1, 1, IF( [Products with Negative Stock] < 5, 0, -1 ) )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = LinearReversed
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 0.1
+
+			annotation KpiThreshold_1 = 5
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		sourceColumn: ProductKey
+
+	column DateKey
+		dataType: int64
+		isHidden
+		sourceColumn: DateKey
+
+	column 'Movement Date'
+		dataType: dateTime
+		formatString: Short Date
+		sourceColumn: MovementDate
+
+		annotation Format = <Format Format="DateTimeShortDatePattern" xmlns="" />
+
+	column 'Unit Cost'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: UnitCost
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Units In'
+		dataType: int64
+		sourceColumn: UnitsIn
+
+	column 'Units Out'
+		dataType: int64
+		sourceColumn: UnitsOut
+
+	column 'Units Balance'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: UnitsBalance
+
+	column 'Product-Date Inventory Value' = 'Product Inventory'[Unit Cost] * 'Product Inventory'[Units Balance]
+		dataType: decimal
+		isDataTypeInferred
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Product-Date Optimal Inventory Value' = 'Product Inventory'[Unit Cost] * RELATED( Product[Reorder Point] )
+		dataType: decimal
+		isDataTypeInferred
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Product-Date Max Inventory Value' = 'Product Inventory'[Unit Cost] * RELATED( Product[Safety Stock Level] )
+		dataType: decimal
+		isDataTypeInferred
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Product-Date OverStocked' = IF( 'Product Inventory'[Units Balance] > RELATED( Product[Safety Stock Level] ), 1, 0 )
+		dataType: int64
+		isDataTypeInferred
+
+	column 'Product-Date UnderStocked' = IF( 'Product Inventory'[Units Balance] < RELATED( Product[Reorder Point] ), 1, 0 )
+		dataType: int64
+		isDataTypeInferred
+
+	column 'Product-Date Negative Stock' = IF( 'Product Inventory'[Units Balance] < 0, 1, 0 )
+		dataType: int64
+		isDataTypeInferred
+
+	partition 'Product Inventory 2005' = query
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20050101) AND ([DateKey] <= 20051231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;123&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20050101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20051231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+	partition 'Product Inventory 2006' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20060101) AND ([DateKey] <= 20061231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;123&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20060101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20061231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+	partition 'Product Inventory 2007' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20070101) AND ([DateKey] <= 20071231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;123&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20070101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20071231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+	partition 'Product Inventory 2008' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20080101) AND ([DateKey] <= 20081231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;123&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20080101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20081231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+	partition 'Product Inventory 2009' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20090101) AND ([DateKey] <= 20091231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;123&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20090101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20091231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+	partition 'Product Inventory 2010' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20100101) AND ([DateKey] <= 20101231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;123&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;91&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;MovementDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsIn&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsOut&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitsBalance&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20100101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20101231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = FactProductInventory
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[FactProductInventory].*   FROM [dbo].[FactProductInventory] 
+			```
+

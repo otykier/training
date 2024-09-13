@@ -1,0 +1,207 @@
+table 'Sales Territory'
+
+	measure 'Distinct Count Sales Orders' = [Reseller Distinct Count Sales Order] + [Internet Distinct Count Sales Order]
+		dataType: int64
+		formatString: #,0
+
+	measure 'Total Sales' = [Reseller Total Sales] + [Internet Total Sales]
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Discount Amount' = [Reseller Total Discount Amount] + [Internet Total Discount Amount]
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Products Cost' = [Reseller Total Product Cost] + [Internet Total Product Cost]
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Tax Amount' = [Reseller Total Tax Amount] + [Internet Total Tax Amount]
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Freight' = [Reseller Total Freight] + [Internet Total Freight]
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Gross Profit' = [Reseller Total Gross Profit] + [Internet Total Gross Profit]
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Units Sold' = [Reseller Total Units] + [Internet Total Units]
+		dataType: int64
+		formatString: #,0
+
+	measure 'Order Lines Count' = [Reseller Order Lines Count] + [Internet Order Lines Count]
+		dataType: int64
+		formatString: #,0
+
+	measure 'Total Previous Quarter Gross Profit' = CALCULATE( [Total Gross Profit], PREVIOUSQUARTER( 'Date'[Date] ) )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Current Quarter Gross Profit' = TOTALQTD( [Total Gross Profit], 'Date'[Date] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Previous Quarter Gross Profit Proportion to QTD' = [Total Previous Quarter Gross Profit] * ( [Days In Current Quarter to Date] / [Days In Current Quarter] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Previous Quarter Sales' = CALCULATE( [Total Sales], PREVIOUSQUARTER( 'Date'[Date] ) )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Current Quarter Sales' = TOTALQTD( [Total Sales], 'Date'[Date] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Previous Quarter Sales Proportion to QTD' = [Total Previous Quarter Sales] * ( [Days In Current Quarter to Date] / [Days In Current Quarter] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Sales - Sales Territory sliced by Employee' = [Reseller Total Sales - Sales Territory sliced by Employee] + [Internet Total Sales]
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Current Quarter Sales Performance' = IFERROR( [Total Current Quarter Sales] / [Total Previous Quarter Sales Proportion to QTD], BLANK( ) )
+		dataType: double
+
+		kpi
+			targetExpression = 1.1
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Total Current Quarter Sales Performance] ),
+				    BLANK( ),
+				    IF( [Total Current Quarter Sales Performance] < 0.8, -1, IF( [Total Current Quarter Sales Performance] < 1.07, 0, 1 ) )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Linear
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 0.8
+
+			annotation KpiThreshold_1 = 1.07
+
+	measure 'Total Current Quarter Gross Profit Performance' =
+			IF(
+			    [Total Previous Quarter Gross Profit Proportion to QTD] <> 0,
+			    ( [Total Current Quarter Gross Profit] - [Total Previous Quarter Gross Profit Proportion to QTD] )
+			        / [Total Previous Quarter Gross Profit Proportion to QTD],
+			    BLANK( )
+			)
+		dataType: double
+
+		kpi
+			targetExpression = 1.25
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Total Current Quarter Gross Profit Performance] ),
+				    BLANK( ),
+				    IF(
+				        [Total Current Quarter Gross Profit Performance] < 0.8,
+				        -1,
+				        IF( [Total Current Quarter Gross Profit Performance] < 1.03, 0, 1 )
+				    )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Linear
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 0.8
+
+			annotation KpiThreshold_1 = 1.03
+
+	column SalesTerritoryKey
+		dataType: int64
+		isHidden
+		sourceColumn: SalesTerritoryKey
+
+	column 'Sales Territory Region'
+		dataType: string
+		isDefaultLabel
+		sourceColumn: SalesTerritoryRegion
+
+	column 'Sales Territory Country'
+		dataType: string
+		sourceColumn: SalesTerritoryCountry
+
+	column 'Sales Territory Group'
+		dataType: string
+		sourceColumn: SalesTerritoryGroup
+
+	column 'Sales Territory Image'
+		dataType: binary
+		isDefaultImage
+		sourceColumn: SalesTerritoryImage
+
+	hierarchy Territory
+
+		level Group
+			column: 'Sales Territory Group'
+
+		level Country
+			column: 'Sales Territory Country'
+
+		level Region
+			column: 'Sales Territory Region'
+
+	partition 'Sales Territory' = query
+		source
+			query = SELECT [dbo].[DimSalesTerritory].* 		FROM [dbo].[DimSalesTerritory]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimSalesTerritory
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimSalesTerritory].*   FROM [dbo].[DimSalesTerritory] 
+			```
+

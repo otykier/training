@@ -1,0 +1,59 @@
+table Promotion
+
+	column PromotionKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: PromotionKey
+
+	column 'Promotion Name'
+		dataType: string
+		sourceColumn: EnglishPromotionName
+
+	column DiscountPct
+		dataType: double
+		formatString: 0.00
+		summarizeBy: none
+		sourceColumn: DiscountPct
+
+	column 'Promotion Type'
+		dataType: string
+		sourceColumn: EnglishPromotionType
+
+	column 'Promotion Category'
+		dataType: string
+		sourceColumn: EnglishPromotionCategory
+
+	column 'Promotion Start Date'
+		dataType: dateTime
+		sourceColumn: StartDate
+
+	column 'Promotion End Date'
+		dataType: dateTime
+		sourceColumn: EndDate
+
+	column 'Min Quantity'
+		dataType: int64
+		sourceColumn: MinQty
+
+	column 'Max Quantity'
+		dataType: int64
+		sourceColumn: MaxQty
+
+	partition Promotion = query
+		source
+			query = SELECT [dbo].[DimPromotion].* 		FROM [dbo].[DimPromotion]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimPromotion
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimPromotion].*   FROM [dbo].[DimPromotion] 
+			```
+
