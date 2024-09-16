@@ -54,7 +54,7 @@ Action<string, string> AddCalc = (s, t) => {
     panel.Controls.Add(checkBox);
     checks.Add(checkBox);
     var textBox = new TextBox { Location = new Point(150,0), Width = 200, Text = t };
-	suffixes.Add(textBox);
+    suffixes.Add(textBox);
     panel.Controls.Add(textBox);
     flowPanel.Controls.Add(panel);
 };
@@ -72,7 +72,7 @@ flowPanel.Controls.Add(dateColumnSelector);
 
 AddLabel("Choose Time Intelligence calculations and suffixes:");
 AddCalc("Agg. month-to-date", "MTD");
-AddCalc("Agg. month-to-date", "QTD");
+AddCalc("Agg. quarter-to-date", "QTD");
 AddCalc("Agg. year-to-date", "YTD");
 AddCalc("1 year prior", "1YP");
 AddCalc("2 years prior", "2YP");
@@ -143,10 +143,10 @@ foreach(var m in Selected.Measures)
             string.Format("CALCULATE({0}, PARALLELPERIOD({1}, -2, YEAR))", m.DaxObjectName, dateColumn),
             displayFolder
         );
-		
-	var pyMeasure = checks[3].Checked 
-		? "[" + m.Name + " " + suffixes[3].Text + "]"
-		: string.Format("CALCULATE({0}, PARALLELPERIOD({1}, -1, YEAR))", m.DaxObjectName, dateColumn);
+        
+    var pyMeasure = checks[3].Checked 
+        ? "[" + m.Name + " " + suffixes[3].Text + "]"
+        : string.Format("CALCULATE({0}, PARALLELPERIOD({1}, -1, YEAR))", m.DaxObjectName, dateColumn);
 
     // Year-over-year:
     if(checks[5].Checked)
@@ -158,11 +158,11 @@ foreach(var m in Selected.Measures)
 
     // 2 years prior:
     if(checks[6].Checked)
-		m.Table.AddMeasure(
-			m.Name + " " + suffixes[6].Text,
-			string.Format("DIVIDE({0} - {1}, {1})", m.DaxObjectName, pyMeasure),
-			displayFolder
-		).FormatString = "0.0 %";
+        m.Table.AddMeasure(
+            m.Name + " " + suffixes[6].Text,
+            string.Format("DIVIDE({0} - {1}, {1})", m.DaxObjectName, pyMeasure),
+            displayFolder
+        ).FormatString = "0.0 %";
 }
 
 // ===================== UI code below this line ===========================
