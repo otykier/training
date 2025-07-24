@@ -83,4 +83,10 @@ foreach(Table t in Model.Tables) {
     }
 }
 
+// Finally, remove the developer perspectives (if any):
+foreach(var p in Model.Perspectives.Where(p => p.Name.StartsWith("$")).ToList())
+{
+    p.Delete();
+}
+
 // TODO: Modify other objects based on annotations, if applicable...

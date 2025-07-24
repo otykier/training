@@ -18,15 +18,3 @@ table Currency
 			query = SELECT [dbo].[DimCurrency].* 		FROM [dbo].[DimCurrency]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimCurrency
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimCurrency].*   FROM [dbo].[DimCurrency] 
-			```
-

@@ -15,15 +15,3 @@ table 'Product Category'
 			query = SELECT [dbo].[DimProductCategory].* 		FROM [dbo].[DimProductCategory]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimProductCategory
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimProductCategory].*   FROM [dbo].[DimProductCategory] 
-			```
-

@@ -50,15 +50,3 @@ table Geography
 			query = SELECT [dbo].[DimGeography].* 		FROM [dbo].[DimGeography]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimGeography
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimGeography].*   FROM [dbo].[DimGeography] 
-			```
-

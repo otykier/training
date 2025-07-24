@@ -150,15 +150,3 @@ table Date
 			query = SELECT [dbo].[DimDate].* 		FROM [dbo].[DimDate]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimDate
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimDate].*   FROM [dbo].[DimDate] 
-			```
-

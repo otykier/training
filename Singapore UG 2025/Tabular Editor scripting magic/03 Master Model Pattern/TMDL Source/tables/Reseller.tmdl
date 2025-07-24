@@ -102,15 +102,3 @@ table Reseller
 			query = SELECT [dbo].[DimReseller].* 		FROM [dbo].[DimReseller]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimReseller
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimReseller].*   FROM [dbo].[DimReseller] 
-			```
-

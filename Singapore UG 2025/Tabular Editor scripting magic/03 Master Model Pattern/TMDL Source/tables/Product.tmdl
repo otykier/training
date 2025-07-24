@@ -143,17 +143,5 @@ table Product
 			query = SELECT [dbo].[DimProduct].* 		FROM [dbo].[DimProduct]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimProduct
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimProduct].*   FROM [dbo].[DimProduct] 
-			```
-
 	annotation TabularProcessingBatch_test = 1
 

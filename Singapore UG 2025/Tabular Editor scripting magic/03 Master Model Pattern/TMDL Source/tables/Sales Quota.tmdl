@@ -46,15 +46,3 @@ table 'Sales Quota'
 			query = SELECT [dbo].[FactSalesQuota].* 		FROM [dbo].[FactSalesQuota]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = FactSalesQuota
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[FactSalesQuota].*   FROM [dbo].[FactSalesQuota] 
-			```
-

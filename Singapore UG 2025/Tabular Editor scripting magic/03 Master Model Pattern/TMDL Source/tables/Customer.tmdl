@@ -114,15 +114,3 @@ table Customer
 			query = SELECT [dbo].[DimCustomer].* 		FROM [dbo].[DimCustomer]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimCustomer
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimCustomer].*   FROM [dbo].[DimCustomer] 
-			```
-

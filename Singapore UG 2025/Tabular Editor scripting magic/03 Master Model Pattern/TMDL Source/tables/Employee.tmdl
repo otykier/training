@@ -137,15 +137,3 @@ table Employee
 			query = SELECT [dbo].[DimEmployee].* 		FROM [dbo].[DimEmployee]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimEmployee
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimEmployee].*   FROM [dbo].[DimEmployee] 
-			```
-

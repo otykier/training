@@ -175,15 +175,3 @@ table 'Sales Territory'
 			query = SELECT [dbo].[DimSalesTerritory].* 		FROM [dbo].[DimSalesTerritory]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimSalesTerritory
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimSalesTerritory].*   FROM [dbo].[DimSalesTerritory] 
-			```
-

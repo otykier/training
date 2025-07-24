@@ -45,15 +45,3 @@ table Promotion
 			query = SELECT [dbo].[DimPromotion].* 		FROM [dbo].[DimPromotion]
 			dataSource: 'SqlServer localhost'
 
-		annotation QueryEditorSerialization
-
-		annotation TableWidgetSerialization
-
-	annotation _TM_ExtProp_DbSchemaName = dbo
-
-	annotation _TM_ExtProp_DbTableName = DimPromotion
-
-	annotation _TM_ExtProp_QueryDefinition = ```
-			      SELECT [dbo].[DimPromotion].*   FROM [dbo].[DimPromotion] 
-			```
-
