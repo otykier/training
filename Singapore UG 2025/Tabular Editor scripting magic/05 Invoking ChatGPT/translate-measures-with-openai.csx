@@ -32,7 +32,7 @@ var culture = SelectObject(Model.Cultures);
 if(culture == null) return;
 const string uri = "https://api.openai.com/v1/chat/completions";
 
-const string model = "gpt-4-turbo";
+const string model = "gpt-3.5-turbo-16k";
 var systemPrompt = "In the context of a Power BI semantic model, the user will provide a JSON array of measure names to be translated to " + culture.Name + ". Please respond only with a JSON array containing the translated names.";
 
 const string template = "{{\"model\": \"{0}\",\"messages\": [{{\"role\": \"system\",\"content\":[{{\"type\":\"text\",\"text\":\"{1}\"}}]}},{{\"role\": \"user\",\"content\":[{{\"type\":\"text\",\"text\":\"{2}\"}}]}}],\"temperature\": 1,\"max_tokens\": 4000}}";
