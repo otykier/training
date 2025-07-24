@@ -1,0 +1,5 @@
+{
+  "UseWorkspace": true,
+  "WorkspaceConnection": "provider=MSOLAP;data source=localhost",
+  "WorkspaceDatabase": "WorkspaceDB_DanielOtykier_20240913_124315"
+}

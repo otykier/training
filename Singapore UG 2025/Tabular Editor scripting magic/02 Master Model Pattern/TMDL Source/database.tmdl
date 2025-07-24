@@ -1,0 +1,5 @@
+database AdventureWorks
+	compatibilityLevel: 1600
+	compatibilityMode: analysisServices
+	language: 1033
+

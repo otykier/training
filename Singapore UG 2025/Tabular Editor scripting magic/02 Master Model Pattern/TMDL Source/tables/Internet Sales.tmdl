@@ -1,0 +1,3304 @@
+table 'Internet Sales'
+
+	defaultDetailRowsDefinition =
+			SELECTCOLUMNS (
+			    'Internet Sales',
+			    'Internet Sales'[Customer PO Number],
+			    'Internet Sales'[Discount Amount],
+			    'Internet Sales'[Sales Amount],
+			    "Product Name", RELATED ( 'Product'[Product Name] ),
+			    "Product Category", RELATED ( 'Product Category'[Product Category Name] )
+			)
+
+	measure 'Internet Distinct Count Sales Order' = DISTINCTCOUNT('Internet Sales'[Sales Order Number])
+		dataType: int64
+		formatString: #,0
+
+	measure 'Internet Total Discount Amount' = SUM( 'Internet Sales'[Discount Amount] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Total Product Cost' = SUM( 'Internet Sales'[Total Product Cost] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Total Tax Amount' = SUM( 'Internet Sales'[Tax Amount] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Total Freight' = SUM( 'Internet Sales'[Freight] )
+		dataType: decimal
+		formatString: #,##0.00
+
+	measure 'Internet Total Gross Profit' = SUM( 'Internet Sales'[Gross Profit] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Order Lines Count' = COUNT( 'Internet Sales'[Sales Order Line Number] )
+		dataType: int64
+		formatString: #,0
+
+	measure 'Internet Previous Quarter Gross Profit' =
+			CALCULATE(
+			    [Internet Total Gross Profit],
+			    PREVIOUSQUARTER( 'Date'[Date] )
+			)
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Current Quarter Gross Profit' = TOTALQTD( [Internet Total Gross Profit], 'Date'[Date] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Previous Quarter Gross Profit Proportion to QTD' =
+			[Internet Previous Quarter Gross Profit]
+			    * ( [Days In Current Quarter to Date]
+			    / [Days In Current Quarter] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Previous Quarter Sales' =
+			CALCULATE(
+			    [Internet Total Sales],
+			    PREVIOUSQUARTER( 'Date'[Date] )
+			) + [Days In Current Quarter]
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Current Quarter Sales' = TOTALQTD( [Internet Total Sales], 'Date'[Date] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Previous Quarter Sales Proportion to QTD' =
+			[Internet Previous Quarter Sales]
+			    * ( [Days In Current Quarter] / [Days In Current Quarter] )
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Current Quarter Sales Performance' =
+			IFERROR(
+			    [Internet Current Quarter Sales]
+			        / [Internet Previous Quarter Sales Proportion to QTD],
+			    BLANK( )
+			)
+		dataType: double
+
+		kpi
+			targetExpression = 1.1
+			statusGraphic: Gauge
+			statusExpression =
+				IF(
+				    ISBLANK( [Internet Current Quarter Sales Performance] ),
+				    BLANK( ),
+				    IF(
+				        [Internet Current Quarter Sales Performance] < 1,
+				        -1,
+				        IF(
+				            [Internet Current Quarter Sales Performance] < 1.07,
+				            0,
+				            1
+				        )
+				    )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Linear
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 1
+
+			annotation KpiThreshold_1 = 1.07
+
+	measure 'Internet Current Quarter Gross Profit Performance' =
+			IF(
+			    [Internet Previous Quarter Gross Profit Proportion to QTD]
+			        <> 0,
+			    ( [Internet Current Quarter Gross Profit]
+			        - [Internet Previous Quarter Gross Profit Proportion to QTD] )
+			        / [Internet Previous Quarter Gross Profit Proportion to QTD],
+			    BLANK( )
+			)
+		dataType: double
+		formatString: #,##0.00 %
+
+		kpi
+			targetExpression = 1.25
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK(
+				        [Internet Current Quarter Gross Profit Performance]
+				    ),
+				    BLANK( ),
+				    IF(
+				        [Internet Current Quarter Gross Profit Performance] < 0.8,
+				        -1,
+				        IF(
+				            [Internet Current Quarter Gross Profit Performance] < 1.03,
+				            0,
+				            1
+				        )
+				    )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Linear
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 0.8
+
+			annotation KpiThreshold_1 = 1.03
+
+	measure 'Internet Total Sales' = SUM( 'Internet Sales'[Sales Amount] )
+		dataType: decimal
+		formatString: 0
+
+	measure 'Internet Total Units' = SUM( 'Internet Sales'[Order Quantity] )
+		dataType: int64
+		formatString: #,0
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column OrderDateKey
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: OrderDateKey
+
+	column DueDateKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: DueDateKey
+
+	column ShipDateKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ShipDateKey
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+	column PromotionKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: PromotionKey
+
+	column CurrencyKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: CurrencyKey
+
+	column SalesTerritoryKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: SalesTerritoryKey
+
+	column 'Sales Order Number'
+		dataType: string
+		sourceColumn: SalesOrderNumber
+
+	column 'Sales Order Line Number'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SalesOrderLineNumber
+
+	column 'Revision Number'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: RevisionNumber
+
+	column 'Order Quantity'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: OrderQuantity
+
+	column 'Unit Price'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: UnitPrice
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Extended Amount'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: ExtendedAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Unit Price Discount Pct'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: UnitPriceDiscountPct
+
+	column 'Discount Amount'
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		summarizeBy: none
+		sourceColumn: DiscountAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Product Standard Cost'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: ProductStandardCost
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Total Product Cost'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: TotalProductCost
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Sales Amount'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: SalesAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Tax Amount'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: TaxAmt
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column Freight
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: Freight
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Carrier Tracking Number'
+		dataType: string
+		sourceColumn: CarrierTrackingNumber
+
+	column 'Customer PO Number'
+		dataType: string
+		isAvailableInMdx: false
+		sourceColumn: CustomerPONumber
+
+	column 'Order Date'
+		dataType: dateTime
+		sourceColumn: OrderDate
+
+	column 'Due Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd.MM.yyyy
+		sourceColumn: DueDate
+
+	column 'Ship Date'
+		dataType: dateTime
+		sourceColumn: ShipDate
+
+	column 'Gross Profit' =
+			'Internet Sales'[Sales Amount]
+			    - 'Internet Sales'[Total Product Cost]
+		dataType: decimal
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	partition 'Internet Sales 2010' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales]  WHERE (([OrderDateKey] >= 20100101) AND ([OrderDateKey] <= 20101231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;119&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;110&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;114&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;116&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;135&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;140&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;159&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;127&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;120&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;148&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;128&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;153&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;87&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;160&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;147&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;101&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;93&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;7&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;8&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;9&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;10&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;11&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;12&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;13&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;14&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;15&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;16&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;17&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;18&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;19&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;20&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;21&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;22&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;23&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;24&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;25&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20100101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20101231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2011' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20110101) AND ([OrderDateKey] <= 20111231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;119&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;110&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;114&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;116&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;135&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;140&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;159&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;127&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;120&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;148&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;128&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;153&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;87&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;160&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;147&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;101&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;93&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;7&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;8&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;9&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;10&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;11&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;12&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;13&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;14&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;15&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;16&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;17&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;18&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;19&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;20&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;21&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;22&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;23&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;24&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;25&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20100101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20101231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2012' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20120101) AND ([OrderDateKey] <= 20121231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;119&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;110&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;114&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;116&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;135&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;140&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;159&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;127&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;120&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;148&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;128&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;153&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;87&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;160&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;147&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;101&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;93&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;7&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;8&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;9&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;10&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;11&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;12&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;13&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;14&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;15&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;16&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;17&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;18&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;19&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;20&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;21&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;22&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;23&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;24&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;25&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20100101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20101231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2013' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20130101) AND ([OrderDateKey] <= 20131231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;119&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;110&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;114&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;116&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;135&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;140&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;159&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;127&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;120&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;148&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;128&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;153&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;87&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;160&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;147&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;101&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;93&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;7&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;8&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;9&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;10&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;11&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;12&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;13&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;14&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;15&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;16&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;17&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;18&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;19&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;20&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;21&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;22&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;23&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;24&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;25&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20100101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20101231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2014' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20140101) AND ([OrderDateKey] <= 20141231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;119&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;110&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;114&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;116&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;135&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;140&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;159&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;127&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;120&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;148&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;128&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;153&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;87&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;160&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;147&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;101&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;93&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;7&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;8&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;9&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;10&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;11&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;12&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;13&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;14&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;15&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;16&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;17&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;18&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;19&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;20&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;21&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;22&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;23&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;24&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;25&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20100101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20101231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2015' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20150101) AND ([OrderDateKey] <= 20151231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSerialization =
+				&lt;?xml version="1.0" encoding="UTF-16"?&gt;&lt;Gemini xmlns="TableWidgetSerialization"&gt;&lt;AnnotationContent&gt;&lt;![CDATA[&lt;?xml version="1.0"?&gt;
+				&lt;TableWidgetGridSerialization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+				  &lt;ColumnSuggestedType /&gt;
+				  &lt;ColumnFormat /&gt;
+				  &lt;ColumnAccuracy /&gt;
+				  &lt;ColumnCurrencySymbol /&gt;
+				  &lt;ColumnPositivePattern /&gt;
+				  &lt;ColumnNegativePattern /&gt;
+				  &lt;ColumnWidths&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;105&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;119&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;110&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;111&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;114&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;116&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;135&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;140&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;159&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;127&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;120&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;148&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;128&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;153&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;133&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;112&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;87&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;84&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;160&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;147&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;101&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;92&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;93&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnWidths&gt;
+				  &lt;ColumnDisplayIndex&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;0&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;1&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;2&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;3&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;4&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;PromotionKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;5&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CurrencyKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;6&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesTerritoryKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;7&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;8&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesOrderLineNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;9&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;RevisionNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;10&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderQuantity&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;11&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPrice&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;12&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ExtendedAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;13&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;UnitPriceDiscountPct&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;14&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DiscountAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;15&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ProductStandardCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;16&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TotalProductCost&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;17&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;SalesAmount&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;18&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;TaxAmt&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;19&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;Freight&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;20&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CarrierTrackingNumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;21&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;CustomerPONumber&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;22&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;23&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;DueDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;24&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;ShipDate&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;int&gt;25&lt;/int&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnDisplayIndex&gt;
+				  &lt;ColumnFrozen /&gt;
+				  &lt;ColumnChecked /&gt;
+				  &lt;ColumnFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;FilterExpression xsi:type="LogicalExpression"&gt;
+				          &lt;Operator&gt;AND&lt;/Operator&gt;
+				          &lt;ExpressionList&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;GreaterThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20100101&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				            &lt;FilterExpression xsi:type="ConditionalExpression"&gt;
+				              &lt;Operator&gt;LesserThanEqualTo&lt;/Operator&gt;
+				              &lt;Value xsi:type="xsd:double"&gt;20101231&lt;/Value&gt;
+				            &lt;/FilterExpression&gt;
+				          &lt;/ExpressionList&gt;
+				        &lt;/FilterExpression&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/ColumnFilter&gt;
+				  &lt;SelectionFilter&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;SelectionFilter xsi:nil="true" /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/SelectionFilter&gt;
+				  &lt;FilterParameters&gt;
+				    &lt;item&gt;
+				      &lt;key&gt;
+				        &lt;string&gt;OrderDateKey&lt;/string&gt;
+				      &lt;/key&gt;
+				      &lt;value&gt;
+				        &lt;CommandParameters /&gt;
+				      &lt;/value&gt;
+				    &lt;/item&gt;
+				  &lt;/FilterParameters&gt;
+				  &lt;IsSortDescending&gt;false&lt;/IsSortDescending&gt;
+				&lt;/TableWidgetGridSerialization&gt;]]&gt;&lt;/AnnotationContent&gt;&lt;/Gemini&gt;
+
+		annotation TableWidgetSourceTable
+
+		annotation QueryEditorSerialization
+
+		annotation TabularProcessingBatch_test = 1
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = FactInternetSales
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[FactInternetSales].*   FROM [dbo].[FactInternetSales] 
+			```
+

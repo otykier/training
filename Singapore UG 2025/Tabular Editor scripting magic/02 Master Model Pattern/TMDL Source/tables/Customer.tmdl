@@ -1,0 +1,128 @@
+table Customer
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		sourceColumn: CustomerKey
+
+	column GeographyKey
+		dataType: int64
+		isHidden
+		sourceColumn: GeographyKey
+
+	column 'Customer Id'
+		dataType: string
+		sourceColumn: CustomerAlternateKey
+
+	column Title
+		dataType: string
+		sourceColumn: Title
+
+	column 'First Name'
+		dataType: string
+		sourceColumn: FirstName
+
+	column 'Middle Name'
+		dataType: string
+		sourceColumn: MiddleName
+
+	column 'Last Name'
+		dataType: string
+		sourceColumn: LastName
+
+	column 'Name Style'
+		dataType: boolean
+		sourceColumn: NameStyle
+
+	column 'Birth Date'
+		dataType: dateTime
+		sourceColumn: BirthDate
+
+	column 'Marital Status'
+		dataType: string
+		sourceColumn: MaritalStatus
+
+	column Suffix
+		dataType: string
+		sourceColumn: Suffix
+
+	column Gender
+		dataType: string
+		sourceColumn: Gender
+
+	column 'Email Address'
+		dataType: string
+		sourceColumn: EmailAddress
+
+	column 'Yearly Income'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: YearlyIncome
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Total Children'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: TotalChildren
+
+	column 'Number of Children At Home'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: NumberChildrenAtHome
+
+	column Education
+		dataType: string
+		sourceColumn: EnglishEducation
+
+	column Occupation
+		dataType: string
+		sourceColumn: EnglishOccupation
+
+	column 'Owns House'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceColumn: HouseOwnerFlag
+
+	column 'Total Cars Owned'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: NumberCarsOwned
+
+	column 'Address Line 1'
+		dataType: string
+		sourceColumn: AddressLine1
+
+	column 'Address Line 2'
+		dataType: string
+		sourceColumn: AddressLine2
+
+	column Phone
+		dataType: string
+		sourceColumn: Phone
+
+	column 'Date Of First Purchase'
+		dataType: dateTime
+		sourceColumn: DateFirstPurchase
+
+	column 'Commute Distance'
+		dataType: string
+		sourceColumn: CommuteDistance
+
+	partition Customer = query
+		source
+			query = SELECT [dbo].[DimCustomer].* 		FROM [dbo].[DimCustomer]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimCustomer
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimCustomer].*   FROM [dbo].[DimCustomer] 
+			```
+

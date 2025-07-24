@@ -1,0 +1,64 @@
+table Geography
+
+	column GeographyKey
+		dataType: int64
+		isHidden
+		sourceColumn: GeographyKey
+
+	column City
+		dataType: string
+		sourceColumn: City
+
+	column 'State Province Code'
+		dataType: string
+		sourceColumn: StateProvinceCode
+
+	column 'State Province Name'
+		dataType: string
+		sourceColumn: StateProvinceName
+
+	column 'Country Region Code'
+		dataType: string
+		sourceColumn: CountryRegionCode
+
+	column 'Country Region Name'
+		dataType: string
+		sourceColumn: EnglishCountryRegionName
+
+	column 'Postal Code'
+		dataType: string
+		sourceColumn: PostalCode
+
+	column SalesTerritoryKey
+		dataType: int64
+		isHidden
+		sourceColumn: SalesTerritoryKey
+
+	hierarchy Geography
+
+		level 'Country Region'
+			column: 'Country Region Name'
+
+		level 'State Province'
+			column: 'State Province Name'
+
+		level City
+			column: City
+
+	partition Geography = query
+		source
+			query = SELECT [dbo].[DimGeography].* 		FROM [dbo].[DimGeography]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimGeography
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimGeography].*   FROM [dbo].[DimGeography] 
+			```
+

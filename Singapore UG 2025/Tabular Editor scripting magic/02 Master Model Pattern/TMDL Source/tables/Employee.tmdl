@@ -1,0 +1,151 @@
+table Employee
+
+	column EmployeeKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: EmployeeKey
+
+	column ParentEmployeeKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ParentEmployeeKey
+
+	column 'Employee Id'
+		dataType: string
+		sourceColumn: EmployeeNationalIDAlternateKey
+
+	column SalesTerritoryKey
+		dataType: int64
+		isHidden
+		sourceColumn: SalesTerritoryKey
+
+	column 'First Name'
+		dataType: string
+		sourceColumn: FirstName
+
+	column 'Last Name'
+		dataType: string
+		sourceColumn: LastName
+
+	column 'Middle Name'
+		dataType: string
+		sourceColumn: MiddleName
+
+	column NameStyle
+		dataType: boolean
+		sourceColumn: NameStyle
+
+	column Title
+		dataType: string
+		sourceColumn: Title
+
+	column 'Hire Date'
+		dataType: dateTime
+		sourceColumn: HireDate
+
+	column 'Birth Date'
+		dataType: dateTime
+		sourceColumn: BirthDate
+
+	column Login
+		dataType: string
+		sourceColumn: LoginID
+
+	column Email
+		dataType: string
+		sourceColumn: EmailAddress
+
+	column Phone
+		dataType: string
+		sourceColumn: Phone
+
+	column 'Marital Status'
+		dataType: string
+		sourceColumn: MaritalStatus
+
+	column 'Emergency Contact Name'
+		dataType: string
+		sourceColumn: EmergencyContactName
+
+	column 'Emergency Contact Phone'
+		dataType: string
+		sourceColumn: EmergencyContactPhone
+
+	column 'Is Salaried'
+		dataType: boolean
+		sourceColumn: SalariedFlag
+
+	column Gender
+		dataType: string
+		sourceColumn: Gender
+
+	column 'Pay Frequency'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: PayFrequency
+
+	column 'Base Rate'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: BaseRate
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Vacation Hours'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: VacationHours
+
+	column 'Sick Leave Hours'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SickLeaveHours
+
+	column 'Is Current'
+		dataType: boolean
+		sourceColumn: CurrentFlag
+
+	column 'Is Sales Person'
+		dataType: boolean
+		sourceColumn: SalesPersonFlag
+
+	column 'Department Name'
+		dataType: string
+		sourceColumn: DepartmentName
+
+	column 'Start Date'
+		dataType: dateTime
+		sourceColumn: StartDate
+
+	column 'End Date'
+		dataType: dateTime
+		sourceColumn: EndDate
+
+	column Status
+		dataType: string
+		sourceColumn: Status
+
+	column 'Employee Photo'
+		dataType: binary
+		isDefaultImage
+		sourceColumn: EmployeePhoto
+
+	partition Employee = query
+		source
+			query = SELECT [dbo].[DimEmployee].* 		FROM [dbo].[DimEmployee]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = DimEmployee
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[DimEmployee].*   FROM [dbo].[DimEmployee] 
+			```
+

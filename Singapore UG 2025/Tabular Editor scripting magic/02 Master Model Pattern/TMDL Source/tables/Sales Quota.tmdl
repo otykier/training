@@ -1,0 +1,60 @@
+table 'Sales Quota'
+
+	column SalesQuotaKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: SalesQuotaKey
+
+	column EmployeeKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: EmployeeKey
+
+	column DateKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: DateKey
+
+	column 'Calendar Year'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: CalendarYear
+
+	column 'Calendar Quarter'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: CalendarQuarter
+
+	column 'Sales Amount Quota'
+		dataType: decimal
+		sourceColumn: SalesAmountQuota
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		sourceColumn: Date
+
+		annotation Format = <Format Format="DateTimeShortDatePattern" xmlns="" />
+
+	partition 'Sales Quota' = query
+		source
+			query = SELECT [dbo].[FactSalesQuota].* 		FROM [dbo].[FactSalesQuota]
+			dataSource: 'SqlServer localhost'
+
+		annotation QueryEditorSerialization
+
+		annotation TableWidgetSerialization
+
+	annotation _TM_ExtProp_DbSchemaName = dbo
+
+	annotation _TM_ExtProp_DbTableName = FactSalesQuota
+
+	annotation _TM_ExtProp_QueryDefinition = ```
+			      SELECT [dbo].[FactSalesQuota].*   FROM [dbo].[FactSalesQuota] 
+			```
+
