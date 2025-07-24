@@ -685,6 +685,7 @@
           {
             "name": "ExtendedAmount",
             "dataType": "decimal",
+            "isHidden": true,
             "sourceColumn": "ExtendedAmount",
             "lineageTag": "f48329a4-07a7-4e08-b582-f123f8278dc4"
           },
@@ -697,6 +698,7 @@
           {
             "name": "DiscountAmount",
             "dataType": "double",
+            "isHidden": true,
             "sourceColumn": "DiscountAmount",
             "lineageTag": "4b36456a-2371-4ba6-b288-16a46aba4221"
           },
@@ -709,24 +711,28 @@
           {
             "name": "CostAmount",
             "dataType": "decimal",
+            "isHidden": true,
             "sourceColumn": "TotalProductCost",
             "lineageTag": "61dbadab-0b8a-4120-8966-7142cbb95e68"
           },
           {
             "name": "SalesAmount",
             "dataType": "decimal",
+            "isHidden": true,
             "sourceColumn": "SalesAmount",
             "lineageTag": "2ee0a393-dfca-47c8-813f-eb76a9128d6f"
           },
           {
             "name": "TaxAmount",
             "dataType": "decimal",
+            "isHidden": true,
             "sourceColumn": "TaxAmt",
             "lineageTag": "3d2c548e-a4db-44cb-8ee0-6baf506f1496"
           },
           {
             "name": "FreightAmount",
             "dataType": "decimal",
+            "isHidden": true,
             "sourceColumn": "Freight",
             "lineageTag": "e3f56d65-d25c-42e3-9426-91583a0c8a15"
           },
@@ -765,6 +771,7 @@
             "name": "MarginAmount",
             "dataType": "decimal",
             "isDataTypeInferred": true,
+            "isHidden": true,
             "expression": "'Internet Sales'[SalesAmount] - 'Internet Sales'[CostAmount]",
             "lineageTag": "cb43340f-c60c-45c8-b16d-84a3b7ccdd6e"
           }
@@ -783,6 +790,57 @@
                 "    Data"
               ]
             }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Cost Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[CostAmount]",
+            "expression": "SUM('Internet Sales'[CostAmount])",
+            "formatString": "0.00",
+            "lineageTag": "c0cad024-7b7f-494e-9a7d-685e48c32fad"
+          },
+          {
+            "name": "Discount Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[DiscountAmount]",
+            "expression": "SUM('Internet Sales'[DiscountAmount])",
+            "formatString": "0.00",
+            "lineageTag": "76069146-15bd-4ff6-927e-f20724cbfa25"
+          },
+          {
+            "name": "Extended Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[ExtendedAmount]",
+            "expression": "SUM('Internet Sales'[ExtendedAmount])",
+            "formatString": "0.00",
+            "lineageTag": "26ab40cf-be58-4837-9b6e-fadcaa3b4bcb"
+          },
+          {
+            "name": "Freight Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[FreightAmount]",
+            "expression": "SUM('Internet Sales'[FreightAmount])",
+            "formatString": "0.00",
+            "lineageTag": "6ca6d5e3-5a52-44bb-8876-8e0054e6e53b"
+          },
+          {
+            "name": "Margin Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[MarginAmount]",
+            "expression": "SUM('Internet Sales'[MarginAmount])",
+            "formatString": "0.00",
+            "lineageTag": "632ddb0e-5822-4248-b4a0-6c3a0578a81d"
+          },
+          {
+            "name": "Sales Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[SalesAmount]",
+            "expression": "SUM('Internet Sales'[SalesAmount])",
+            "formatString": "0.00",
+            "lineageTag": "6d9c4aa7-57f8-4f51-88d8-e7a92c799983"
+          },
+          {
+            "name": "Tax Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[TaxAmount]",
+            "expression": "SUM('Internet Sales'[TaxAmount])",
+            "formatString": "0.00",
+            "lineageTag": "39e55792-bd6c-4096-bff5-7b14f49b12af"
           }
         ]
       },
