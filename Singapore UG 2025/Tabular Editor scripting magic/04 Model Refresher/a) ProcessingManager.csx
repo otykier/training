@@ -27,6 +27,8 @@ var sb_ExportScript = new System.Text.StringBuilder();
 string newline = Environment.NewLine;
 string ebiURL = @"https://www.elegantbi.com";
 
+System.Windows.Forms.Application.UseWaitCursor = false;
+
 // Start screen
 System.Windows.Forms.Form newForm = new System.Windows.Forms.Form();
 System.Windows.Forms.Panel startPanel = new System.Windows.Forms.Panel();
