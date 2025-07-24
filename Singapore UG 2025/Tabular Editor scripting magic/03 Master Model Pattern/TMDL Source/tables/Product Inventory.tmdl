@@ -1,23 +1,18 @@
 table 'Product Inventory'
 
 	measure 'Total Units In' = SUM( 'Product Inventory'[Units In] )
-		dataType: int64
 		formatString: #,0
 
 	measure 'Total Units Out' = SUM( 'Product Inventory'[Units Out] )
-		dataType: int64
 		formatString: #,0
 
 	measure 'Total Units Movement' = [Total Units In] - [Total Units Out]
-		dataType: int64
 		formatString: #,0
 
 	measure 'Total Units' = CALCULATE( SUM( 'Product Inventory'[Units Balance] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
-		dataType: int64
 		formatString: #,0
 
 	measure 'Total Inventory Value' = CALCULATE( SUM( 'Product Inventory'[Product-Date Inventory Value] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
-		dataType: decimal
 		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
 
 		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
@@ -27,7 +22,6 @@ table 'Product Inventory'
 			    SUM( 'Product Inventory'[Product-Date Optimal Inventory Value] ),
 			    LASTDATE( 'Product Inventory'[Movement Date] )
 			)
-		dataType: decimal
 		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
 
 		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
@@ -37,7 +31,6 @@ table 'Product Inventory'
 			    SUM( 'Product Inventory'[Product-Date Max Inventory Value] ),
 			    LASTDATE( 'Product Inventory'[Movement Date] )
 			)
-		dataType: decimal
 		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
 
 		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
@@ -49,7 +42,6 @@ table 'Product Inventory'
 			    ( [Total Inventory Value] - [Total Inventory Optimal Value] )
 			        / ( [Total Inventory Maximum Value] - [Total Inventory Optimal Value] )
 			)
-		dataType: double
 
 		kpi
 			targetExpression = 0
@@ -84,7 +76,6 @@ table 'Product Inventory'
 			annotation KpiThreshold_3 = 1
 
 	measure 'Products OverStocked' = CALCULATE( SUM( 'Product Inventory'[Product-Date OverStocked] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
-		dataType: int64
 
 		kpi
 			targetExpression = 0
@@ -111,7 +102,6 @@ table 'Product Inventory'
 			annotation KpiThreshold_1 = 5
 
 	measure 'Products UnderStocked' = CALCULATE( SUM( 'Product Inventory'[Product-Date UnderStocked] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
-		dataType: int64
 
 		kpi
 			targetExpression = 0
@@ -138,7 +128,6 @@ table 'Product Inventory'
 			annotation KpiThreshold_1 = 15
 
 	measure 'Products with Negative Stock' = CALCULATE( SUM( 'Product Inventory'[Product-Date Negative Stock] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
-		dataType: int64
 
 		kpi
 			targetExpression = 0
@@ -202,34 +191,22 @@ table 'Product Inventory'
 		sourceColumn: UnitsBalance
 
 	column 'Product-Date Inventory Value' = 'Product Inventory'[Unit Cost] * 'Product Inventory'[Units Balance]
-		dataType: decimal
-		isDataTypeInferred
 
 		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
 
 	column 'Product-Date Optimal Inventory Value' = 'Product Inventory'[Unit Cost] * RELATED( Product[Reorder Point] )
-		dataType: decimal
-		isDataTypeInferred
 
 		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
 
 	column 'Product-Date Max Inventory Value' = 'Product Inventory'[Unit Cost] * RELATED( Product[Safety Stock Level] )
-		dataType: decimal
-		isDataTypeInferred
 
 		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
 
 	column 'Product-Date OverStocked' = IF( 'Product Inventory'[Units Balance] > RELATED( Product[Safety Stock Level] ), 1, 0 )
-		dataType: int64
-		isDataTypeInferred
 
 	column 'Product-Date UnderStocked' = IF( 'Product Inventory'[Units Balance] < RELATED( Product[Reorder Point] ), 1, 0 )
-		dataType: int64
-		isDataTypeInferred
 
 	column 'Product-Date Negative Stock' = IF( 'Product Inventory'[Units Balance] < 0, 1, 0 )
-		dataType: int64
-		isDataTypeInferred
 
 	partition 'Product Inventory 2005' = query
 		source

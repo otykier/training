@@ -40,5 +40,7 @@ else if (Selected.Tables.Count > 0)
 }
 else { Warning("Can't execute query for: " + Selected.Summary()); return; }
 
+// Uncomment line below to view the generated DAX:
 // Output(dax);
+
 EvaluateDax(dax).Output();

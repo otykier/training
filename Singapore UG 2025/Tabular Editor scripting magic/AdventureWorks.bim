@@ -218,7 +218,7 @@
           },
           {
             "name": "Owns House",
-            "dataType": "boolean",
+            "dataType": "string",
             "sourceColumn": "HouseOwnerFlag",
             "formatString": "\"TRUE\";\"TRUE\";\"FALSE\"",
             "attributeHierarchy": {}
@@ -361,7 +361,7 @@
           {
             "name": "Month Name",
             "dataType": "string",
-            "sourceColumn": "MonthName",
+            "sourceColumn": "EnglishMonthName",
             "sortByColumn": "Month",
             "attributeHierarchy": {}
           },
@@ -2163,7 +2163,7 @@
           },
           {
             "name": "Discount Amount",
-            "dataType": "decimal",
+            "dataType": "double",
             "sourceColumn": "DiscountAmount",
             "formatString": "\\$#,0.00;(\\$#,0.00);\\$#,0.00",
             "summarizeBy": "none",
@@ -7807,7 +7807,7 @@
           },
           {
             "name": "Discount Amount",
-            "dataType": "decimal",
+            "dataType": "double",
             "sourceColumn": "DiscountAmount",
             "formatString": "\\$#,0.00;(\\$#,0.00);\\$#,0.00",
             "attributeHierarchy": {},

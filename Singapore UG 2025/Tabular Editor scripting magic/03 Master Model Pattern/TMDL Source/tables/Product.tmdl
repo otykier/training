@@ -121,12 +121,8 @@ table Product
 		sourceColumn: Status
 
 	column 'Product SubCategory Name' = RELATED( 'Product Subcategory'[Product Subcategory Name] )
-		dataType: string
-		isDataTypeInferred
 
 	column 'Product Category Name' = RELATED( 'Product Category'[Product Category Name] )
-		dataType: string
-		isDataTypeInferred
 
 	hierarchy Category
 

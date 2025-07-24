@@ -2,10 +2,8 @@ table Date
 	dataCategory: Time
 
 	measure 'Days In Current Quarter to Date' = COUNTROWS( DATESQTD( 'Date'[Date] ) )
-		dataType: int64
 
 	measure 'Days In Current Quarter' = COUNTROWS( DATESBETWEEN( 'Date'[Date], STARTOFQUARTER( LASTDATE( 'Date'[Date] ) ), ENDOFQUARTER( 'Date'[Date] ) ) )
-		dataType: int64
 
 	column DateKey
 		dataType: int64
@@ -46,7 +44,7 @@ table Date
 
 	column 'Month Name'
 		dataType: string
-		sourceColumn: MonthName
+		sourceColumn: EnglishMonthName
 		sortByColumn: Month
 
 	column Month
@@ -85,15 +83,11 @@ table Date
 		sourceColumn: FiscalSemester
 
 	column 'Month Year' = 'Date'[Month Name] & " " & 'Date'[Calendar Year]
-		dataType: string
 		lineageTag: 09b8776e-645f-4b2c-962d-0d2500c59831
-		isDataTypeInferred
 		sortByColumn: 'Month Year Number'
 
 	column 'Month Year Number' = 'Date'[Calendar Year]*100 + 'Date'[Month]
-		dataType: int64
 		lineageTag: a10706dc-54af-4db8-b890-74e6b4ff757d
-		isDataTypeInferred
 
 	hierarchy Calendar
 

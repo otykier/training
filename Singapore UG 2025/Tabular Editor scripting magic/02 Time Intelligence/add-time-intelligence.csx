@@ -20,6 +20,7 @@ if(Selected.Measures.Count == 0) {
 
 // ===================== UI code below this line ===========================
 Application.UseWaitCursor = false;
+WaitFormVisible = false;
 
 var aggForm = new Form
 {
@@ -53,7 +54,7 @@ Action<string, string> AddCalc = (s, t) => {
     var checkBox = new CheckBox { Text = s, AutoSize = true, Location = new Point(0, 2), Checked = true };
     panel.Controls.Add(checkBox);
     checks.Add(checkBox);
-    var textBox = new TextBox { Location = new Point(150,0), Width = 200, Text = t };
+    var textBox = new TextBox { Location = new Point(250,0), Width = 200, Text = t };
     suffixes.Add(textBox);
     panel.Controls.Add(textBox);
     flowPanel.Controls.Add(panel);

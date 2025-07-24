@@ -80,7 +80,7 @@ table Customer
 		sourceColumn: EnglishOccupation
 
 	column 'Owns House'
-		dataType: boolean
+		dataType: string
 		formatString: """TRUE"";""TRUE"";""FALSE"""
 		sourceColumn: HouseOwnerFlag
 
