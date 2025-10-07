@@ -1,0 +1,7 @@
+DEFINE
+FUNCTION SubtractValues = (x, y) => x - y
+
+EVALUATE
+{
+    SubtractValues([Sales Amount], [Total Cost] * 10)
+}

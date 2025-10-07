@@ -1,0 +1,6 @@
+EVALUATE
+
+CALCULATETABLE(
+    Demo2.ExpressionParams( [Sales Amount] ),
+    Product[Color] = "Blue"
+)
