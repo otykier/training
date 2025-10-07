@@ -1,0 +1,20 @@
+table Currency
+
+	column CurrencyKey
+		dataType: int64
+		isHidden
+		sourceColumn: CurrencyKey
+
+	column 'Currency Code'
+		dataType: string
+		sourceColumn: CurrencyAlternateKey
+
+	column CurrencyName
+		dataType: string
+		sourceColumn: CurrencyName
+
+	partition Currency = query
+		source
+			query = SELECT [dbo].[DimCurrency].* 		FROM [dbo].[DimCurrency]
+			dataSource: 'SqlServer localhost'
+

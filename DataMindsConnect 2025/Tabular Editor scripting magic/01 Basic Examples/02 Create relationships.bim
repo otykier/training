@@ -1,0 +1,998 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1600,
+  "model": {
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "SQLDW",
+        "connectionDetails": {
+          "protocol": "tds",
+          "address": {
+            "server": "localhost",
+            "database": "AdventureWorksDW2019"
+          }
+        },
+        "credential": {
+          "AuthenticationKind": "ServiceAccount"
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "Date",
+        "lineageTag": "aaf3e265-51ce-4f88-b401-25d163e8e16c",
+        "columns": [
+          {
+            "name": "DateKey",
+            "dataType": "int64",
+            "sourceColumn": "DateKey",
+            "lineageTag": "e7e0f6f6-11db-43f2-aecb-2dfadccec652"
+          },
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Date",
+            "lineageTag": "b3b93273-59b3-47cd-9d4a-f4f899df4ef7"
+          },
+          {
+            "name": "DayNumberOfWeek",
+            "dataType": "int64",
+            "sourceColumn": "DayNumberOfWeek",
+            "lineageTag": "be56c08e-64d6-496d-aff5-9dcc0602d39f"
+          },
+          {
+            "name": "EnglishDayNameOfWeek",
+            "dataType": "string",
+            "sourceColumn": "EnglishDayNameOfWeek",
+            "lineageTag": "ecb13b54-e669-4548-b8e4-f444313f0125"
+          },
+          {
+            "name": "SpanishDayNameOfWeek",
+            "dataType": "string",
+            "sourceColumn": "SpanishDayNameOfWeek",
+            "lineageTag": "afdebdcf-85a4-4126-b0e9-66a902dfde26"
+          },
+          {
+            "name": "FrenchDayNameOfWeek",
+            "dataType": "string",
+            "sourceColumn": "FrenchDayNameOfWeek",
+            "lineageTag": "5ae75820-d91e-4867-a48d-40999d5eac51"
+          },
+          {
+            "name": "DayNumberOfMonth",
+            "dataType": "int64",
+            "sourceColumn": "DayNumberOfMonth",
+            "lineageTag": "7706f4ed-42e9-4368-95dd-2bca427b4367"
+          },
+          {
+            "name": "DayNumberOfYear",
+            "dataType": "int64",
+            "sourceColumn": "DayNumberOfYear",
+            "lineageTag": "c520cf3b-3ca4-4040-967b-ea21df9f5bc3"
+          },
+          {
+            "name": "WeekNumberOfYear",
+            "dataType": "int64",
+            "sourceColumn": "WeekNumberOfYear",
+            "lineageTag": "c56bddb3-9a9e-4e06-98cb-0da1202190a7"
+          },
+          {
+            "name": "EnglishMonthName",
+            "dataType": "string",
+            "sourceColumn": "EnglishMonthName",
+            "lineageTag": "7996dbad-2f79-416e-bee8-d53eef1f94e2"
+          },
+          {
+            "name": "SpanishMonthName",
+            "dataType": "string",
+            "sourceColumn": "SpanishMonthName",
+            "lineageTag": "f58bc9f3-aab6-481d-bfdd-3848253b8274"
+          },
+          {
+            "name": "FrenchMonthName",
+            "dataType": "string",
+            "sourceColumn": "FrenchMonthName",
+            "lineageTag": "9544ae58-2e3e-4238-9134-bc6d1581ff83"
+          },
+          {
+            "name": "MonthNumberOfYear",
+            "dataType": "int64",
+            "sourceColumn": "MonthNumberOfYear",
+            "lineageTag": "a91e45da-8cdb-4b56-9902-08d7fb941a42"
+          },
+          {
+            "name": "CalendarQuarter",
+            "dataType": "int64",
+            "sourceColumn": "CalendarQuarter",
+            "lineageTag": "73b706ad-a847-4610-9152-cdbc03bc97d5"
+          },
+          {
+            "name": "CalendarYear",
+            "dataType": "int64",
+            "sourceColumn": "CalendarYear",
+            "lineageTag": "51386057-2a83-4e52-91bb-5f2beb702bc5"
+          },
+          {
+            "name": "CalendarSemester",
+            "dataType": "int64",
+            "sourceColumn": "CalendarSemester",
+            "lineageTag": "3ac7bc3e-038a-4938-9e9a-7e9b1e462842"
+          },
+          {
+            "name": "FiscalQuarter",
+            "dataType": "int64",
+            "sourceColumn": "FiscalQuarter",
+            "lineageTag": "6833b652-2da5-439b-9742-0d394891c89e"
+          },
+          {
+            "name": "FiscalYear",
+            "dataType": "int64",
+            "sourceColumn": "FiscalYear",
+            "lineageTag": "29e06383-16df-46e4-b7fd-b2f89a796f9f"
+          },
+          {
+            "name": "FiscalSemester",
+            "dataType": "int64",
+            "sourceColumn": "FiscalSemester",
+            "lineageTag": "ace3074d-ba2f-45e4-ab16-47fd0cc11d43"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Date",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQLDW\",",
+                "    Data = Source{[Schema=\"dbo\",Item=\"DimDate\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Customer",
+        "lineageTag": "fb556053-4d13-4b3b-8896-852ccad36965",
+        "columns": [
+          {
+            "name": "CustomerKey",
+            "dataType": "int64",
+            "sourceColumn": "CustomerKey",
+            "lineageTag": "65685fbc-b309-47bb-8cb5-c8dbc75ffcca"
+          },
+          {
+            "name": "GeographyKey",
+            "dataType": "int64",
+            "sourceColumn": "GeographyKey",
+            "lineageTag": "b3300876-3ac9-47e0-90d6-b8d2d7c4231e"
+          },
+          {
+            "name": "CustomerAlternateKey",
+            "dataType": "string",
+            "sourceColumn": "CustomerAlternateKey",
+            "lineageTag": "de98c033-2dab-4281-8cb0-c2299be8bc3f"
+          },
+          {
+            "name": "Title",
+            "dataType": "string",
+            "sourceColumn": "Title",
+            "lineageTag": "87c1061a-8f50-452f-bec0-e5a846b18337"
+          },
+          {
+            "name": "FirstName",
+            "dataType": "string",
+            "sourceColumn": "FirstName",
+            "lineageTag": "c5f22466-aa35-4010-b4ac-28f93f5b4d50"
+          },
+          {
+            "name": "MiddleName",
+            "dataType": "string",
+            "sourceColumn": "MiddleName",
+            "lineageTag": "8de28f96-57dd-4263-84de-721afb7afb3f"
+          },
+          {
+            "name": "LastName",
+            "dataType": "string",
+            "sourceColumn": "LastName",
+            "lineageTag": "668f2170-1dab-4a2c-8bd0-1126b8ba49c8"
+          },
+          {
+            "name": "NameStyle",
+            "dataType": "boolean",
+            "sourceColumn": "NameStyle",
+            "lineageTag": "a4f498e8-15ce-4af8-b5c5-1e631a7f008f"
+          },
+          {
+            "name": "BirthDate",
+            "dataType": "dateTime",
+            "sourceColumn": "BirthDate",
+            "lineageTag": "c29e2591-108a-4d80-a068-b4de1426446b"
+          },
+          {
+            "name": "MaritalStatus",
+            "dataType": "string",
+            "sourceColumn": "MaritalStatus",
+            "lineageTag": "aeafb4e1-919b-4cad-ac5e-aba09df54544"
+          },
+          {
+            "name": "Suffix",
+            "dataType": "string",
+            "sourceColumn": "Suffix",
+            "lineageTag": "bcbfee48-36ed-44a8-ab2a-a3ad07173a44"
+          },
+          {
+            "name": "Gender",
+            "dataType": "string",
+            "sourceColumn": "Gender",
+            "lineageTag": "2401abaf-4f82-4544-ab21-2ebcb51cf24b"
+          },
+          {
+            "name": "EmailAddress",
+            "dataType": "string",
+            "sourceColumn": "EmailAddress",
+            "lineageTag": "0a1878f3-3b98-4e1f-beb1-cf39d439b9d5"
+          },
+          {
+            "name": "YearlyIncome",
+            "dataType": "decimal",
+            "sourceColumn": "YearlyIncome",
+            "lineageTag": "1b2ae7ae-7686-4663-bc5a-d19c4735ef58"
+          },
+          {
+            "name": "TotalChildren",
+            "dataType": "int64",
+            "sourceColumn": "TotalChildren",
+            "lineageTag": "cb1a042a-cd57-419d-9bba-77eca44f3011"
+          },
+          {
+            "name": "NumberChildrenAtHome",
+            "dataType": "int64",
+            "sourceColumn": "NumberChildrenAtHome",
+            "lineageTag": "e338ee09-41a3-4399-af5b-b2b719c0cd16"
+          },
+          {
+            "name": "EnglishEducation",
+            "dataType": "string",
+            "sourceColumn": "EnglishEducation",
+            "lineageTag": "7d7d50ce-4985-4ad7-babb-5adf6f78cbd4"
+          },
+          {
+            "name": "SpanishEducation",
+            "dataType": "string",
+            "sourceColumn": "SpanishEducation",
+            "lineageTag": "a5f65bf4-90fb-4066-8dda-c15eb8b200d0"
+          },
+          {
+            "name": "FrenchEducation",
+            "dataType": "string",
+            "sourceColumn": "FrenchEducation",
+            "lineageTag": "de9a0f66-aaaf-4c31-8f6c-533478b21c51"
+          },
+          {
+            "name": "EnglishOccupation",
+            "dataType": "string",
+            "sourceColumn": "EnglishOccupation",
+            "lineageTag": "5c54e2de-1711-44d0-82b4-f92768c16945"
+          },
+          {
+            "name": "SpanishOccupation",
+            "dataType": "string",
+            "sourceColumn": "SpanishOccupation",
+            "lineageTag": "175fdc35-1b40-482d-8234-011ad571c089"
+          },
+          {
+            "name": "FrenchOccupation",
+            "dataType": "string",
+            "sourceColumn": "FrenchOccupation",
+            "lineageTag": "1703a409-148d-4b09-8b97-66f38ca41c1c"
+          },
+          {
+            "name": "HouseOwnerFlag",
+            "dataType": "string",
+            "sourceColumn": "HouseOwnerFlag",
+            "lineageTag": "db374b8c-fdba-4a9a-a61f-811cda1a3b1e"
+          },
+          {
+            "name": "NumberCarsOwned",
+            "dataType": "int64",
+            "sourceColumn": "NumberCarsOwned",
+            "lineageTag": "f776a7b4-a34c-4953-ac60-4bba6ecfd91a"
+          },
+          {
+            "name": "AddressLine1",
+            "dataType": "string",
+            "sourceColumn": "AddressLine1",
+            "lineageTag": "88b49b93-8598-4e38-9613-1c62b9f03b8a"
+          },
+          {
+            "name": "AddressLine2",
+            "dataType": "string",
+            "sourceColumn": "AddressLine2",
+            "lineageTag": "fb4c01fc-c1d5-4a84-9f44-3461ac0cd37b"
+          },
+          {
+            "name": "Phone",
+            "dataType": "string",
+            "sourceColumn": "Phone",
+            "lineageTag": "8737173c-357b-4654-bb97-e863dd6931db"
+          },
+          {
+            "name": "DateFirstPurchase",
+            "dataType": "dateTime",
+            "sourceColumn": "DateFirstPurchase",
+            "lineageTag": "5c5977b1-2372-4740-908b-934168b39f62"
+          },
+          {
+            "name": "CommuteDistance",
+            "dataType": "string",
+            "sourceColumn": "CommuteDistance",
+            "lineageTag": "ed4934e4-c8ef-4674-a039-d3217efc48ec"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Customer",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQLDW\",",
+                "    Data = Source{[Schema=\"dbo\",Item=\"DimCustomer\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Product",
+        "lineageTag": "48fa9a60-f5af-48a4-94b2-dee58c98260d",
+        "columns": [
+          {
+            "name": "ProductKey",
+            "dataType": "int64",
+            "sourceColumn": "ProductKey",
+            "lineageTag": "682db91b-bd5b-4c5e-af93-a55be5a19b1a"
+          },
+          {
+            "name": "ProductAlternateKey",
+            "dataType": "string",
+            "sourceColumn": "ProductAlternateKey",
+            "lineageTag": "32884a23-0855-4fd9-b3a7-62abd34651b1"
+          },
+          {
+            "name": "ProductSubcategoryKey",
+            "dataType": "int64",
+            "sourceColumn": "ProductSubcategoryKey",
+            "lineageTag": "e1fc884e-be44-4979-b7a6-69cec1b3422a"
+          },
+          {
+            "name": "WeightUnitMeasureCode",
+            "dataType": "string",
+            "sourceColumn": "WeightUnitMeasureCode",
+            "lineageTag": "84f827e3-a09a-4634-91c5-86778a3d2a81"
+          },
+          {
+            "name": "SizeUnitMeasureCode",
+            "dataType": "string",
+            "sourceColumn": "SizeUnitMeasureCode",
+            "lineageTag": "08a98452-17e6-4fbc-a5c3-2b91041cdeda"
+          },
+          {
+            "name": "EnglishProductName",
+            "dataType": "string",
+            "sourceColumn": "EnglishProductName",
+            "lineageTag": "52b17888-5cc0-42b4-919a-0dc556c7207b"
+          },
+          {
+            "name": "SpanishProductName",
+            "dataType": "string",
+            "sourceColumn": "SpanishProductName",
+            "lineageTag": "d1b4630e-8e5c-4bb2-b1e9-30b7d9b66279"
+          },
+          {
+            "name": "FrenchProductName",
+            "dataType": "string",
+            "sourceColumn": "FrenchProductName",
+            "lineageTag": "31a20a11-63c8-4635-b4d8-7390ef1ab39d"
+          },
+          {
+            "name": "StandardCost",
+            "dataType": "decimal",
+            "sourceColumn": "StandardCost",
+            "lineageTag": "a8ed1264-6dfd-4071-9965-5bc63d9534e0"
+          },
+          {
+            "name": "FinishedGoodsFlag",
+            "dataType": "boolean",
+            "sourceColumn": "FinishedGoodsFlag",
+            "lineageTag": "15f01c2e-b2c2-450f-ac40-7fac49cb8547"
+          },
+          {
+            "name": "Color",
+            "dataType": "string",
+            "sourceColumn": "Color",
+            "lineageTag": "196446c5-543b-4ad1-bded-28b81a084984"
+          },
+          {
+            "name": "SafetyStockLevel",
+            "dataType": "int64",
+            "sourceColumn": "SafetyStockLevel",
+            "lineageTag": "d3a7ea64-3bf0-4550-ba44-daa6e7ff509d"
+          },
+          {
+            "name": "ReorderPoint",
+            "dataType": "int64",
+            "sourceColumn": "ReorderPoint",
+            "lineageTag": "77ca2f83-3ae4-4dd2-ad4a-f817ef87a232"
+          },
+          {
+            "name": "ListPrice",
+            "dataType": "decimal",
+            "sourceColumn": "ListPrice",
+            "lineageTag": "0788ae2c-854f-4ee6-8a5c-2baebe7ecf84"
+          },
+          {
+            "name": "Size",
+            "dataType": "string",
+            "sourceColumn": "Size",
+            "lineageTag": "62be3b9d-ff8d-4312-9aea-b91f61b2d1ee"
+          },
+          {
+            "name": "SizeRange",
+            "dataType": "string",
+            "sourceColumn": "SizeRange",
+            "lineageTag": "90371990-5bb1-4055-a162-201d389f0d63"
+          },
+          {
+            "name": "Weight",
+            "dataType": "double",
+            "sourceColumn": "Weight",
+            "lineageTag": "8b5648e2-1c57-4542-ad81-586f5da6db97"
+          },
+          {
+            "name": "DaysToManufacture",
+            "dataType": "int64",
+            "sourceColumn": "DaysToManufacture",
+            "lineageTag": "65df6bcf-9158-4563-bd2d-5dad9ed57830"
+          },
+          {
+            "name": "ProductLine",
+            "dataType": "string",
+            "sourceColumn": "ProductLine",
+            "lineageTag": "814071bc-b83d-4b79-a017-3df3cc3d1f5c"
+          },
+          {
+            "name": "DealerPrice",
+            "dataType": "decimal",
+            "sourceColumn": "DealerPrice",
+            "lineageTag": "d59b3764-d480-4fff-8bc1-eaed8243d038"
+          },
+          {
+            "name": "Class",
+            "dataType": "string",
+            "sourceColumn": "Class",
+            "lineageTag": "67b4f3c1-c4c4-40f5-b885-4a4aed07ef2f"
+          },
+          {
+            "name": "Style",
+            "dataType": "string",
+            "sourceColumn": "Style",
+            "lineageTag": "b624941f-5fe1-481e-ae93-bf118d43374b"
+          },
+          {
+            "name": "ModelName",
+            "dataType": "string",
+            "sourceColumn": "ModelName",
+            "lineageTag": "1e08b248-9caf-4d56-be1a-2cd6304d1a57"
+          },
+          {
+            "name": "LargePhoto",
+            "dataType": "binary",
+            "sourceColumn": "LargePhoto",
+            "lineageTag": "e58ffc33-bdac-42a4-a899-c8ab165e06bd"
+          },
+          {
+            "name": "EnglishDescription",
+            "dataType": "string",
+            "sourceColumn": "EnglishDescription",
+            "lineageTag": "0c3cb3bb-73c6-47cc-beb7-0081b659465d"
+          },
+          {
+            "name": "FrenchDescription",
+            "dataType": "string",
+            "sourceColumn": "FrenchDescription",
+            "lineageTag": "0c3dbdda-a11f-43d6-8aa4-85fc78f23337"
+          },
+          {
+            "name": "ChineseDescription",
+            "dataType": "string",
+            "sourceColumn": "ChineseDescription",
+            "lineageTag": "19769c02-c786-4211-9021-8b7c480d6860"
+          },
+          {
+            "name": "ArabicDescription",
+            "dataType": "string",
+            "sourceColumn": "ArabicDescription",
+            "lineageTag": "3e5e6fa2-c1cd-4a9d-9499-6076ee181c68"
+          },
+          {
+            "name": "HebrewDescription",
+            "dataType": "string",
+            "sourceColumn": "HebrewDescription",
+            "lineageTag": "b71b0116-f4d4-496d-a49c-a9febd177fab"
+          },
+          {
+            "name": "ThaiDescription",
+            "dataType": "string",
+            "sourceColumn": "ThaiDescription",
+            "lineageTag": "34c84dfb-8e6c-4811-8c91-dc644a478f06"
+          },
+          {
+            "name": "GermanDescription",
+            "dataType": "string",
+            "sourceColumn": "GermanDescription",
+            "lineageTag": "31597009-3a9f-4738-ae63-7e4fb3aef8db"
+          },
+          {
+            "name": "JapaneseDescription",
+            "dataType": "string",
+            "sourceColumn": "JapaneseDescription",
+            "lineageTag": "5cce0a56-92a4-40ff-97dd-4da80487e608"
+          },
+          {
+            "name": "TurkishDescription",
+            "dataType": "string",
+            "sourceColumn": "TurkishDescription",
+            "lineageTag": "739556dc-debe-4296-bd9f-913be2f196e7"
+          },
+          {
+            "name": "StartDate",
+            "dataType": "dateTime",
+            "sourceColumn": "StartDate",
+            "lineageTag": "9e5e1d2a-de01-4526-8c4b-a64a95262465"
+          },
+          {
+            "name": "EndDate",
+            "dataType": "dateTime",
+            "sourceColumn": "EndDate",
+            "lineageTag": "5e89fe94-e717-4743-9c75-c5335946b1a8"
+          },
+          {
+            "name": "Status",
+            "dataType": "string",
+            "sourceColumn": "Status",
+            "lineageTag": "996e6e22-7dce-4bf9-8250-011cb8e5688e"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Product",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQLDW\",",
+                "    Data = Source{[Schema=\"dbo\",Item=\"DimProduct\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Internet Sales",
+        "lineageTag": "06270d6d-79cf-4beb-ab0b-55a34d8fd9a6",
+        "columns": [
+          {
+            "name": "ProductKey",
+            "dataType": "int64",
+            "sourceColumn": "ProductKey",
+            "lineageTag": "29000984-f3ce-49f3-8a1c-2dd3337f61c8"
+          },
+          {
+            "name": "OrderDateKey",
+            "dataType": "int64",
+            "sourceColumn": "OrderDateKey",
+            "lineageTag": "35a9df10-bfee-4d32-8d56-7440892f9d07"
+          },
+          {
+            "name": "DueDateKey",
+            "dataType": "int64",
+            "sourceColumn": "DueDateKey",
+            "lineageTag": "23921d89-3af4-4d01-a69c-f71453cf7fd8"
+          },
+          {
+            "name": "ShipDateKey",
+            "dataType": "int64",
+            "sourceColumn": "ShipDateKey",
+            "lineageTag": "33a46633-1717-41be-913e-b995ca6976ad"
+          },
+          {
+            "name": "CustomerKey",
+            "dataType": "int64",
+            "sourceColumn": "CustomerKey",
+            "lineageTag": "7493b2bf-d9da-4334-8338-76739622fe02"
+          },
+          {
+            "name": "PromotionKey",
+            "dataType": "int64",
+            "sourceColumn": "PromotionKey",
+            "lineageTag": "d35df050-a39d-4260-98a3-532c48c547e3"
+          },
+          {
+            "name": "CurrencyKey",
+            "dataType": "int64",
+            "sourceColumn": "CurrencyKey",
+            "lineageTag": "5f4b02d1-dec9-40ab-9160-114bdf87d74d"
+          },
+          {
+            "name": "SalesTerritoryKey",
+            "dataType": "int64",
+            "sourceColumn": "SalesTerritoryKey",
+            "lineageTag": "3c95197c-c4fd-4e74-9a88-2f3d1d1d894d"
+          },
+          {
+            "name": "SalesOrderNumber",
+            "dataType": "string",
+            "sourceColumn": "SalesOrderNumber",
+            "lineageTag": "08e8340b-10e1-406a-8445-060125053714"
+          },
+          {
+            "name": "SalesOrderLineNumber",
+            "dataType": "int64",
+            "sourceColumn": "SalesOrderLineNumber",
+            "lineageTag": "666a0fd2-41a8-44e5-a7ba-e99b67728d50"
+          },
+          {
+            "name": "RevisionNumber",
+            "dataType": "int64",
+            "sourceColumn": "RevisionNumber",
+            "lineageTag": "6e69651e-589e-4142-bb67-52b2fe377454"
+          },
+          {
+            "name": "OrderQuantity",
+            "dataType": "int64",
+            "sourceColumn": "OrderQuantity",
+            "lineageTag": "3b66eaaf-a9eb-404e-9cd4-1b0dca1fe2d7"
+          },
+          {
+            "name": "UnitPrice",
+            "dataType": "decimal",
+            "sourceColumn": "UnitPrice",
+            "lineageTag": "563f412a-9d2e-4a46-acfc-d385e30adc98"
+          },
+          {
+            "name": "ExtendedAmount",
+            "dataType": "decimal",
+            "sourceColumn": "ExtendedAmount",
+            "lineageTag": "f48329a4-07a7-4e08-b582-f123f8278dc4"
+          },
+          {
+            "name": "UnitPriceDiscountPct",
+            "dataType": "double",
+            "sourceColumn": "UnitPriceDiscountPct",
+            "lineageTag": "0f7ec675-d16f-44de-b482-aca67891cafe"
+          },
+          {
+            "name": "DiscountAmount",
+            "dataType": "double",
+            "sourceColumn": "DiscountAmount",
+            "lineageTag": "4b36456a-2371-4ba6-b288-16a46aba4221"
+          },
+          {
+            "name": "ProductStandardCost",
+            "dataType": "decimal",
+            "sourceColumn": "ProductStandardCost",
+            "lineageTag": "23c3ed02-7958-4a74-803f-3595dc886e29"
+          },
+          {
+            "name": "TotalProductCost",
+            "dataType": "decimal",
+            "sourceColumn": "TotalProductCost",
+            "lineageTag": "61dbadab-0b8a-4120-8966-7142cbb95e68"
+          },
+          {
+            "name": "SalesAmount",
+            "dataType": "decimal",
+            "sourceColumn": "SalesAmount",
+            "lineageTag": "2ee0a393-dfca-47c8-813f-eb76a9128d6f"
+          },
+          {
+            "name": "TaxAmt",
+            "dataType": "decimal",
+            "sourceColumn": "TaxAmt",
+            "lineageTag": "3d2c548e-a4db-44cb-8ee0-6baf506f1496"
+          },
+          {
+            "name": "Freight",
+            "dataType": "decimal",
+            "sourceColumn": "Freight",
+            "lineageTag": "e3f56d65-d25c-42e3-9426-91583a0c8a15"
+          },
+          {
+            "name": "CarrierTrackingNumber",
+            "dataType": "string",
+            "sourceColumn": "CarrierTrackingNumber",
+            "lineageTag": "7ad8c2fe-da56-4bb5-85c6-456cda0f642b"
+          },
+          {
+            "name": "CustomerPONumber",
+            "dataType": "string",
+            "sourceColumn": "CustomerPONumber",
+            "lineageTag": "cedf573f-cd8b-434f-a07d-6488bc4572d7"
+          },
+          {
+            "name": "OrderDate",
+            "dataType": "dateTime",
+            "sourceColumn": "OrderDate",
+            "lineageTag": "e6723fdc-3db3-4a77-8888-d6c368088c80"
+          },
+          {
+            "name": "DueDate",
+            "dataType": "dateTime",
+            "sourceColumn": "DueDate",
+            "lineageTag": "9af2e4ca-1554-45c8-b266-db224e3a1644"
+          },
+          {
+            "name": "ShipDate",
+            "dataType": "dateTime",
+            "sourceColumn": "ShipDate",
+            "lineageTag": "50a6b8a7-301f-4d04-88bb-fc2bd78e5d72"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Internet Sales",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQLDW\",",
+                "    Data = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Promotion",
+        "lineageTag": "a1750e5f-5609-4c96-b57e-5229cd6cf47e",
+        "columns": [
+          {
+            "name": "PromotionKey",
+            "dataType": "int64",
+            "sourceColumn": "PromotionKey",
+            "lineageTag": "9e693b2e-1a23-4fb3-8cf5-af78d4217379"
+          },
+          {
+            "name": "PromotionAlternateKey",
+            "dataType": "int64",
+            "sourceColumn": "PromotionAlternateKey",
+            "lineageTag": "77791a6d-dbbe-46d2-9897-e9ac4b726d90"
+          },
+          {
+            "name": "EnglishPromotionName",
+            "dataType": "string",
+            "sourceColumn": "EnglishPromotionName",
+            "lineageTag": "8f817003-1ab9-44c7-9594-b58bb587e156"
+          },
+          {
+            "name": "SpanishPromotionName",
+            "dataType": "string",
+            "sourceColumn": "SpanishPromotionName",
+            "lineageTag": "18165588-33b6-4c9c-8a7d-5d7d02431e0b"
+          },
+          {
+            "name": "FrenchPromotionName",
+            "dataType": "string",
+            "sourceColumn": "FrenchPromotionName",
+            "lineageTag": "d50f4f3c-baf1-44f5-a6fb-4262fbbea6e9"
+          },
+          {
+            "name": "DiscountPct",
+            "dataType": "double",
+            "sourceColumn": "DiscountPct",
+            "lineageTag": "1f4ccdfa-4cb0-4f65-8d12-ac4d011bdb05"
+          },
+          {
+            "name": "EnglishPromotionType",
+            "dataType": "string",
+            "sourceColumn": "EnglishPromotionType",
+            "lineageTag": "e7b6815f-696e-45d3-a785-c4aa59d2baf6"
+          },
+          {
+            "name": "SpanishPromotionType",
+            "dataType": "string",
+            "sourceColumn": "SpanishPromotionType",
+            "lineageTag": "ccc6e21c-4b02-42dd-b6b7-156d45d401ae"
+          },
+          {
+            "name": "FrenchPromotionType",
+            "dataType": "string",
+            "sourceColumn": "FrenchPromotionType",
+            "lineageTag": "5b91c016-07cc-4859-91b5-a01d68f20b6d"
+          },
+          {
+            "name": "EnglishPromotionCategory",
+            "dataType": "string",
+            "sourceColumn": "EnglishPromotionCategory",
+            "lineageTag": "96b591ed-2391-467c-b67a-6fd35ecf3b94"
+          },
+          {
+            "name": "SpanishPromotionCategory",
+            "dataType": "string",
+            "sourceColumn": "SpanishPromotionCategory",
+            "lineageTag": "4763b333-e422-4313-b0a2-af24e1476a61"
+          },
+          {
+            "name": "FrenchPromotionCategory",
+            "dataType": "string",
+            "sourceColumn": "FrenchPromotionCategory",
+            "lineageTag": "3a667a60-d0cc-4d21-aac1-3861c8aa8909"
+          },
+          {
+            "name": "StartDate",
+            "dataType": "dateTime",
+            "sourceColumn": "StartDate",
+            "lineageTag": "e91c58c5-1d54-40e6-88b5-ec1147b98955"
+          },
+          {
+            "name": "EndDate",
+            "dataType": "dateTime",
+            "sourceColumn": "EndDate",
+            "lineageTag": "5aff69ac-29b2-4657-912b-41bed746fe14"
+          },
+          {
+            "name": "MinQty",
+            "dataType": "int64",
+            "sourceColumn": "MinQty",
+            "lineageTag": "dce0faa1-444c-4ce1-8b04-bb4443304dbe"
+          },
+          {
+            "name": "MaxQty",
+            "dataType": "int64",
+            "sourceColumn": "MaxQty",
+            "lineageTag": "41d500b7-d97a-4265-85c2-1c2368240232"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Promotion",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQLDW\",",
+                "    Data = Source{[Schema=\"dbo\",Item=\"DimPromotion\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Currency",
+        "lineageTag": "6b35b4e3-7475-4808-938b-002c4b536b7b",
+        "columns": [
+          {
+            "name": "CurrencyKey",
+            "dataType": "int64",
+            "sourceColumn": "CurrencyKey",
+            "lineageTag": "55b8872a-d0cb-4e00-97df-328fd2149039"
+          },
+          {
+            "name": "CurrencyAlternateKey",
+            "dataType": "string",
+            "sourceColumn": "CurrencyAlternateKey",
+            "lineageTag": "6c94b6f5-6453-4f32-9a8e-5841a8678da5"
+          },
+          {
+            "name": "CurrencyName",
+            "dataType": "string",
+            "sourceColumn": "CurrencyName",
+            "lineageTag": "6e0ef4c6-689e-42f6-b980-3601c20448f5"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Currency",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQLDW\",",
+                "    Data = Source{[Schema=\"dbo\",Item=\"DimCurrency\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sales Territory",
+        "lineageTag": "fef6a989-d4d4-4537-89ea-b790e59dfdda",
+        "columns": [
+          {
+            "name": "SalesTerritoryKey",
+            "dataType": "int64",
+            "sourceColumn": "SalesTerritoryKey",
+            "lineageTag": "6a06d601-198a-4e8f-abfd-540ba0b78c33"
+          },
+          {
+            "name": "SalesTerritoryAlternateKey",
+            "dataType": "int64",
+            "sourceColumn": "SalesTerritoryAlternateKey",
+            "lineageTag": "8eb49273-f320-42f9-8cb0-7772a1c37e0a"
+          },
+          {
+            "name": "SalesTerritoryRegion",
+            "dataType": "string",
+            "sourceColumn": "SalesTerritoryRegion",
+            "lineageTag": "99e37746-3ea8-4ba4-ba6a-92c2e10608cd"
+          },
+          {
+            "name": "SalesTerritoryCountry",
+            "dataType": "string",
+            "sourceColumn": "SalesTerritoryCountry",
+            "lineageTag": "8f124809-f1ac-4a50-825a-d81165f11e5a"
+          },
+          {
+            "name": "SalesTerritoryGroup",
+            "dataType": "string",
+            "sourceColumn": "SalesTerritoryGroup",
+            "lineageTag": "9943b9d6-0f92-4bed-8ff9-ed8cf4413dfd"
+          },
+          {
+            "name": "SalesTerritoryImage",
+            "dataType": "binary",
+            "sourceColumn": "SalesTerritoryImage",
+            "lineageTag": "f85a391e-43bd-4ac5-aa5a-b1f9610abe75"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Sales Territory",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQLDW\",",
+                "    Data = Source{[Schema=\"dbo\",Item=\"DimSalesTerritory\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "annotations": [
+      {
+        "name": "TabularEditor_SerializeOptions",
+        "value": "{\"IgnoreInferredObjects\":true,\"IgnoreInferredProperties\":true,\"IgnoreTimestamps\":true,\"SplitMultilineStrings\":true,\"PrefixFilenames\":false,\"LocalTranslations\":true,\"LocalPerspectives\":true,\"LocalRelationships\":true,\"Levels\":[\"Data Sources\",\"Perspectives\",\"Relationships\",\"Roles\",\"Shared Expressions\",\"Tables\",\"Tables/CalculationItems\",\"Tables/Columns\",\"Tables/Hierarchies\",\"Tables/Measures\",\"Tables/Partitions\",\"Translations\"]}"
+      },
+      {
+        "name": "__TEdtr",
+        "value": "1"
+      }
+    ]
+  }
+}

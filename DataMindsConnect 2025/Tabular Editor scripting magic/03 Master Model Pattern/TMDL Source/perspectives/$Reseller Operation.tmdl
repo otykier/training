@@ -1,0 +1,432 @@
+perspective '$Reseller Operation'
+
+	perspectiveTable Date
+
+		perspectiveMeasure 'Days In Current Quarter to Date'
+
+		perspectiveMeasure 'Days In Current Quarter'
+
+		perspectiveColumn 'Month Name'
+
+		perspectiveColumn 'Calendar Quarter'
+
+		perspectiveColumn Month
+
+		perspectiveColumn 'Week Of Year'
+
+		perspectiveColumn 'Calendar Year'
+
+		perspectiveColumn 'Fiscal Quarter'
+
+		perspectiveColumn 'Day Of Month'
+
+		perspectiveColumn 'Fiscal Year'
+
+		perspectiveColumn 'Day Name Of Week'
+
+		perspectiveColumn 'Day Of Year'
+
+		perspectiveColumn DateKey
+
+		perspectiveColumn Date
+
+		perspectiveColumn 'Fiscal Semester'
+
+		perspectiveColumn 'Day Number Of Week'
+
+		perspectiveColumn 'Calendar Semester'
+
+		perspectiveHierarchy Calendar
+
+		perspectiveHierarchy 'Production Calendar'
+
+		perspectiveHierarchy Fiscal
+
+	perspectiveTable 'Reseller Sales'
+
+		perspectiveMeasure 'Reseller Total Tax Amount'
+
+		perspectiveMeasure 'Reseller Distinct Count Sales Order'
+
+		perspectiveMeasure 'Reseller Previous Quarter Gross Profit Proportion to QTD'
+
+		perspectiveMeasure 'Reseller Total Discount Amount'
+
+		perspectiveMeasure 'Reseller Current Quarter Sales'
+
+		perspectiveMeasure 'Reseller Total Gross Profit'
+
+		perspectiveMeasure 'Reseller Order Lines Count'
+
+		perspectiveMeasure 'Reseller Previous Quarter Sales Proportion to QTD'
+
+		perspectiveMeasure 'Reseller Total Product Cost'
+
+		perspectiveMeasure 'Reseller Previous Quarter Sales'
+
+		perspectiveMeasure 'Reseller Total Sales'
+
+		perspectiveMeasure 'Reseller Current Quarter Gross Profit Performance'
+
+		perspectiveMeasure 'Reseller Current Quarter Sales Performance'
+
+		perspectiveMeasure 'Reseller Total Units'
+
+		perspectiveMeasure 'Reseller Total Freight'
+
+		perspectiveMeasure 'Reseller Total Sales - Sales Territory sliced by Reseller'
+
+		perspectiveMeasure 'Reseller Total Sales - Sales Territory sliced by Employee'
+
+		perspectiveMeasure 'Reseller Current Quarter Gross Profit'
+
+		perspectiveMeasure 'Reseller Previous Quarter Gross Profit'
+
+		perspectiveColumn 'Carrier Tracking Number'
+
+		perspectiveColumn 'Order Date'
+
+		perspectiveColumn 'Sales Order Line Number'
+
+		perspectiveColumn 'Due Date'
+
+		perspectiveColumn 'Gross Profit'
+
+		perspectiveColumn 'Sales Order Number'
+
+		perspectiveColumn 'Discount Amount'
+
+		perspectiveColumn 'Sales Amount'
+
+		perspectiveColumn PromotionKey
+
+		perspectiveColumn ResellerKey
+
+		perspectiveColumn DueDateKey
+
+		perspectiveColumn EmployeeKey
+
+		perspectiveColumn ProductKey
+
+		perspectiveColumn 'Reseller PO Number'
+
+		perspectiveColumn 'Unit Price'
+
+		perspectiveColumn Freight
+
+		perspectiveColumn 'Total Product Cost'
+
+		perspectiveColumn CurrencyKey
+
+		perspectiveColumn ShipDateKey
+
+		perspectiveColumn 'Product Standard Cost'
+
+		perspectiveColumn 'Extended Amount'
+
+		perspectiveColumn 'Order Quantity'
+
+		perspectiveColumn 'Revision Number'
+
+		perspectiveColumn SalesTerritoryKey
+
+		perspectiveColumn 'Tax Amount'
+
+		perspectiveColumn OrderDateKey
+
+		perspectiveColumn 'Unit Price Discount Pct'
+
+		perspectiveColumn 'Ship Date'
+
+	perspectiveTable 'Sales Territory'
+
+		perspectiveMeasure 'Total Gross Profit'
+
+		perspectiveMeasure 'Distinct Count Sales Orders'
+
+		perspectiveMeasure 'Total Previous Quarter Sales'
+
+		perspectiveMeasure 'Total Previous Quarter Gross Profit Proportion to QTD'
+
+		perspectiveMeasure 'Order Lines Count'
+
+		perspectiveMeasure 'Total Discount Amount'
+
+		perspectiveMeasure 'Total Previous Quarter Sales Proportion to QTD'
+
+		perspectiveMeasure 'Total Products Cost'
+
+		perspectiveMeasure 'Total Units Sold'
+
+		perspectiveMeasure 'Total Current Quarter Gross Profit Performance'
+
+		perspectiveMeasure 'Total Current Quarter Gross Profit'
+
+		perspectiveMeasure 'Total Previous Quarter Gross Profit'
+
+		perspectiveMeasure 'Total Sales - Sales Territory sliced by Employee'
+
+		perspectiveMeasure 'Total Current Quarter Sales'
+
+		perspectiveMeasure 'Total Tax Amount'
+
+		perspectiveMeasure 'Total Current Quarter Sales Performance'
+
+		perspectiveMeasure 'Total Freight'
+
+		perspectiveMeasure 'Total Sales'
+
+		perspectiveColumn 'Sales Territory Region'
+
+		perspectiveColumn SalesTerritoryKey
+
+		perspectiveColumn 'Sales Territory Country'
+
+		perspectiveColumn 'Sales Territory Group'
+
+		perspectiveColumn 'Sales Territory Image'
+
+		perspectiveHierarchy Territory
+
+	perspectiveTable Product
+
+		perspectiveColumn 'Product SubCategory Name'
+
+		perspectiveColumn Style
+
+		perspectiveColumn 'Model Name'
+
+		perspectiveColumn 'Product Name'
+
+		perspectiveColumn 'Product Start Date'
+
+		perspectiveColumn 'Weight Unit Code'
+
+		perspectiveColumn 'Safety Stock Level'
+
+		perspectiveColumn 'Product Id'
+
+		perspectiveColumn 'Standard Cost'
+
+		perspectiveColumn Color
+
+		perspectiveColumn 'Days To Manufacture'
+
+		perspectiveColumn 'Dealer Price'
+
+		perspectiveColumn ProductKey
+
+		perspectiveColumn LargePhoto
+
+		perspectiveColumn Size
+
+		perspectiveColumn 'Is Finished Goods'
+
+		perspectiveColumn Description
+
+		perspectiveColumn 'Product Line'
+
+		perspectiveColumn 'Size Unit Code'
+
+		perspectiveColumn 'List Price'
+
+		perspectiveColumn Class
+
+		perspectiveColumn 'Size Range'
+
+		perspectiveColumn 'Reorder Point'
+
+		perspectiveColumn 'Product Status'
+
+		perspectiveColumn Weight
+
+		perspectiveColumn ProductSubcategoryKey
+
+		perspectiveColumn 'Product Category Name'
+
+		perspectiveColumn 'Product End Date'
+
+		perspectiveHierarchy Category
+
+	perspectiveTable Promotion
+
+		perspectiveColumn 'Promotion Name'
+
+		perspectiveColumn 'Max Quantity'
+
+		perspectiveColumn 'Promotion Type'
+
+		perspectiveColumn 'Promotion Start Date'
+
+		perspectiveColumn 'Min Quantity'
+
+		perspectiveColumn 'Promotion Category'
+
+		perspectiveColumn DiscountPct
+
+		perspectiveColumn PromotionKey
+
+		perspectiveColumn 'Promotion End Date'
+
+	perspectiveTable 'Product Subcategory'
+
+		perspectiveColumn 'Product Subcategory Name'
+
+		perspectiveColumn ProductSubcategoryKey
+
+		perspectiveColumn ProductCategoryKey
+
+	perspectiveTable Employee
+
+		perspectiveColumn ParentEmployeeKey
+
+		perspectiveColumn 'Middle Name'
+
+		perspectiveColumn NameStyle
+
+		perspectiveColumn 'Hire Date'
+
+		perspectiveColumn 'Marital Status'
+
+		perspectiveColumn 'Pay Frequency'
+
+		perspectiveColumn Phone
+
+		perspectiveColumn Email
+
+		perspectiveColumn Gender
+
+		perspectiveColumn 'Vacation Hours'
+
+		perspectiveColumn 'Employee Id'
+
+		perspectiveColumn 'Is Current'
+
+		perspectiveColumn Login
+
+		perspectiveColumn 'First Name'
+
+		perspectiveColumn 'Is Salaried'
+
+		perspectiveColumn 'Base Rate'
+
+		perspectiveColumn 'Birth Date'
+
+		perspectiveColumn 'Sick Leave Hours'
+
+		perspectiveColumn 'Last Name'
+
+		perspectiveColumn SalesTerritoryKey
+
+		perspectiveColumn Status
+
+		perspectiveColumn 'Emergency Contact Name'
+
+		perspectiveColumn Title
+
+		perspectiveColumn 'Department Name'
+
+		perspectiveColumn 'Emergency Contact Phone'
+
+		perspectiveColumn EmployeeKey
+
+		perspectiveColumn 'End Date'
+
+		perspectiveColumn 'Is Sales Person'
+
+		perspectiveColumn 'Employee Photo'
+
+		perspectiveColumn 'Start Date'
+
+	perspectiveTable Geography
+
+		perspectiveColumn City
+
+		perspectiveColumn 'State Province Name'
+
+		perspectiveColumn 'Country Region Code'
+
+		perspectiveColumn 'State Province Code'
+
+		perspectiveColumn SalesTerritoryKey
+
+		perspectiveColumn GeographyKey
+
+		perspectiveColumn 'Country Region Name'
+
+		perspectiveColumn 'Postal Code'
+
+		perspectiveHierarchy Geography
+
+	perspectiveTable Reseller
+
+		perspectiveColumn 'Year Opened'
+
+		perspectiveColumn 'Order Month'
+
+		perspectiveColumn 'Business Type'
+
+		perspectiveColumn 'Annual Sales'
+
+		perspectiveColumn 'First Order Year'
+
+		perspectiveColumn 'Number Employees'
+
+		perspectiveColumn 'Order Frequency'
+
+		perspectiveColumn 'Reseller Id'
+
+		perspectiveColumn 'Address Line 2'
+
+		perspectiveColumn GeographyKey
+
+		perspectiveColumn 'Reseller Phone'
+
+		perspectiveColumn ResellerKey
+
+		perspectiveColumn 'Min Payment Type'
+
+		perspectiveColumn 'Address Line 1'
+
+		perspectiveColumn 'Bank Name'
+
+		perspectiveColumn 'Annua Revenue'
+
+		perspectiveColumn 'Reseller Name'
+
+		perspectiveColumn 'Min Payment Amount'
+
+		perspectiveColumn 'Product Line'
+
+		perspectiveColumn 'Last Order Year'
+
+	perspectiveTable 'Sales Quota'
+
+		perspectiveColumn 'Calendar Quarter'
+
+		perspectiveColumn 'Sales Amount Quota'
+
+		perspectiveColumn 'Calendar Year'
+
+		perspectiveColumn Date
+
+		perspectiveColumn DateKey
+
+		perspectiveColumn EmployeeKey
+
+		perspectiveColumn SalesQuotaKey
+
+	perspectiveTable Currency
+
+		perspectiveColumn CurrencyKey
+
+		perspectiveColumn 'Currency Code'
+
+		perspectiveColumn CurrencyName
+
+	perspectiveTable 'Product Category'
+
+		perspectiveColumn 'Product Category Name'
+
+		perspectiveColumn ProductCategoryKey
+

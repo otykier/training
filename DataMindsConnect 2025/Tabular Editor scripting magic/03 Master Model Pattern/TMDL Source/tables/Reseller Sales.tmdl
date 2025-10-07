@@ -1,0 +1,341 @@
+table 'Reseller Sales'
+
+	measure 'Reseller Distinct Count Sales Order' = DISTINCTCOUNT( 'Reseller Sales'[Sales Order Number] )
+		formatString: #,0
+
+	measure 'Reseller Total Sales' = SUM( 'Reseller Sales'[Sales Amount] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Total Discount Amount' = SUM( 'Reseller Sales'[Discount Amount] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Total Product Cost' = SUM( 'Reseller Sales'[Total Product Cost] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Total Tax Amount' = SUM( 'Reseller Sales'[Tax Amount] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Total Freight' = SUM( 'Reseller Sales'[Freight] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Total Gross Profit' = SUM( 'Reseller Sales'[Gross Profit] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Total Units' = SUM( 'Reseller Sales'[Order Quantity] )
+		formatString: #,0
+
+	measure 'Reseller Order Lines Count' = COUNT( 'Reseller Sales'[Sales Order Line Number] )
+		formatString: #,0
+
+	measure 'Reseller Previous Quarter Gross Profit' = CALCULATE( [Reseller Total Gross Profit], PREVIOUSQUARTER( 'Date'[Date] ) )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Current Quarter Gross Profit' = TOTALQTD( [Reseller Total Gross Profit], 'Date'[Date] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Previous Quarter Gross Profit Proportion to QTD' = [Reseller Previous Quarter Gross Profit] * ( [Days In Current Quarter to Date] / [Days In Current Quarter] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Previous Quarter Sales' = CALCULATE( [Reseller Total Sales], PREVIOUSQUARTER( 'Date'[Date] ) )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Current Quarter Sales' = TOTALQTD( [Reseller Total Sales], 'Date'[Date] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Previous Quarter Sales Proportion to QTD' = [Reseller Previous Quarter Sales] * ( [Days In Current Quarter to Date] / [Days In Current Quarter] )
+
+	measure 'Reseller Total Sales - Sales Territory sliced by Employee' =
+			CALCULATE(
+			    SUM( 'Reseller Sales'[Sales Amount] ),
+			    USERELATIONSHIP( Employee[EmployeeKey], 'Reseller Sales'[EmployeeKey] ),
+			    USERELATIONSHIP( 'Sales Territory'[SalesTerritoryKey], Employee[SalesTerritoryKey] )
+			)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Total Sales - Sales Territory sliced by Reseller' =
+			CALCULATE(
+			    SUM( 'Reseller Sales'[Sales Amount] ),
+			    USERELATIONSHIP( Reseller[ResellerKey], 'Reseller Sales'[ResellerKey] ),
+			    USERELATIONSHIP( Geography[GeographyKey], Reseller[GeographyKey] ),
+			    USERELATIONSHIP( 'Sales Territory'[SalesTerritoryKey], Geography[SalesTerritoryKey] )
+			)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Reseller Current Quarter Sales Performance' = IFERROR( [Reseller Current Quarter Sales] / [Reseller Previous Quarter Sales Proportion to QTD], BLANK( ) )
+
+		kpi
+			targetExpression = 1.1
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Reseller Current Quarter Sales Performance] ),
+				    BLANK( ),
+				    IF(
+				        [Reseller Current Quarter Sales Performance] < 0.8,
+				        -1,
+				        IF( [Reseller Current Quarter Sales Performance] < 1.07, 0, 1 )
+				    )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Linear
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 0.8
+
+			annotation KpiThreshold_1 = 1.07
+
+	measure 'Reseller Current Quarter Gross Profit Performance' =
+			IF(
+			    [Reseller Previous Quarter Gross Profit Proportion to QTD] <> 0,
+			    ( [Reseller Current Quarter Gross Profit] - [Reseller Previous Quarter Gross Profit Proportion to QTD] )
+			        / [Reseller Previous Quarter Gross Profit Proportion to QTD],
+			    BLANK( )
+			)
+
+		kpi
+			targetExpression = 1.25
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Reseller Current Quarter Gross Profit Performance] ),
+				    BLANK( ),
+				    IF(
+				        [Reseller Current Quarter Gross Profit Performance] < 0.8,
+				        -1,
+				        IF( [Reseller Current Quarter Gross Profit Performance] < 1.03, 0, 1 )
+				    )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Linear
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 0.8
+
+			annotation KpiThreshold_1 = 1.03
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		sourceColumn: ProductKey
+
+	column OrderDateKey
+		dataType: int64
+		isHidden
+		sourceColumn: OrderDateKey
+
+	column DueDateKey
+		dataType: int64
+		isHidden
+		sourceColumn: DueDateKey
+
+	column ShipDateKey
+		dataType: int64
+		isHidden
+		sourceColumn: ShipDateKey
+
+	column ResellerKey
+		dataType: int64
+		isHidden
+		sourceColumn: ResellerKey
+
+	column EmployeeKey
+		dataType: int64
+		isHidden
+		sourceColumn: EmployeeKey
+
+	column PromotionKey
+		dataType: int64
+		isHidden
+		sourceColumn: PromotionKey
+
+	column CurrencyKey
+		dataType: int64
+		isHidden
+		sourceColumn: CurrencyKey
+
+	column SalesTerritoryKey
+		dataType: int64
+		isHidden
+		sourceColumn: SalesTerritoryKey
+
+	column 'Sales Order Number'
+		dataType: string
+		sourceColumn: SalesOrderNumber
+
+	column 'Sales Order Line Number'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SalesOrderLineNumber
+
+	column 'Revision Number'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: RevisionNumber
+
+	column 'Order Quantity'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: OrderQuantity
+
+	column 'Unit Price'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: UnitPrice
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Extended Amount'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: ExtendedAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Unit Price Discount Pct'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: UnitPriceDiscountPct
+
+	column 'Discount Amount'
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		sourceColumn: DiscountAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Product Standard Cost'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: ProductStandardCost
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Total Product Cost'
+		dataType: decimal
+		sourceColumn: TotalProductCost
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Sales Amount'
+		dataType: decimal
+		sourceColumn: SalesAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Tax Amount'
+		dataType: decimal
+		sourceColumn: TaxAmt
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column Freight
+		dataType: decimal
+		sourceColumn: Freight
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Carrier Tracking Number'
+		dataType: string
+		sourceColumn: CarrierTrackingNumber
+
+	column 'Reseller PO Number'
+		dataType: string
+		sourceColumn: CustomerPONumber
+
+	column 'Order Date'
+		dataType: dateTime
+		formatString: Short Date
+		sourceColumn: OrderDate
+
+		annotation Format = <Format Format="DateTimeShortDatePattern" xmlns="" />
+
+	column 'Due Date'
+		dataType: dateTime
+		formatString: Short Date
+		sourceColumn: DueDate
+
+		annotation Format = <Format Format="DateTimeShortDatePattern" xmlns="" />
+
+	column 'Ship Date'
+		dataType: dateTime
+		formatString: Short Date
+		sourceColumn: ShipDate
+
+		annotation Format = <Format Format="DateTimeShortDatePattern" xmlns="" />
+
+	column 'Gross Profit' = 'Reseller Sales'[Sales Amount] - 'Reseller Sales'[Total Product Cost]
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	partition 'Reseller Sales 2010' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactResellerSales].* 		FROM [dbo].[FactResellerSales]  WHERE (([OrderDateKey] >= 20100101) AND ([OrderDateKey] <= 20101231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+	partition 'Reseller Sales 2010 1' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactResellerSales].* 		FROM [dbo].[FactResellerSales]  WHERE (([OrderDateKey] >= 20100101) AND ([OrderDateKey] <= 20101231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+	partition 'Reseller Sales 2010 2' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactResellerSales].* 		FROM [dbo].[FactResellerSales]  WHERE (([OrderDateKey] >= 20100101) AND ([OrderDateKey] <= 20101231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+	partition 'Reseller Sales 2010 3' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactResellerSales].* 		FROM [dbo].[FactResellerSales]  WHERE (([OrderDateKey] >= 20100101) AND ([OrderDateKey] <= 20101231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+

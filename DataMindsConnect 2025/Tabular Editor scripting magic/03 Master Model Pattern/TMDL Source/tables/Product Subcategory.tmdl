@@ -1,0 +1,23 @@
+table 'Product Subcategory'
+
+	column ProductSubcategoryKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ProductSubcategoryKey
+
+	column 'Product Subcategory Name'
+		dataType: string
+		sourceColumn: EnglishProductSubcategoryName
+
+	column ProductCategoryKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ProductCategoryKey
+
+	partition 'Product Subcategory' = query
+		source
+			query = SELECT [dbo].[DimProductSubcategory].* 		FROM [dbo].[DimProductSubcategory]
+			dataSource: 'SqlServer localhost'
+

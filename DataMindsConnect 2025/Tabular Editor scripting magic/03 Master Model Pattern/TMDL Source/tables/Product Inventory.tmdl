@@ -1,0 +1,257 @@
+table 'Product Inventory'
+
+	measure 'Total Units In' = SUM( 'Product Inventory'[Units In] )
+		formatString: #,0
+
+	measure 'Total Units Out' = SUM( 'Product Inventory'[Units Out] )
+		formatString: #,0
+
+	measure 'Total Units Movement' = [Total Units In] - [Total Units Out]
+		formatString: #,0
+
+	measure 'Total Units' = CALCULATE( SUM( 'Product Inventory'[Units Balance] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+		formatString: #,0
+
+	measure 'Total Inventory Value' = CALCULATE( SUM( 'Product Inventory'[Product-Date Inventory Value] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Inventory Optimal Value' =
+			CALCULATE(
+			    SUM( 'Product Inventory'[Product-Date Optimal Inventory Value] ),
+			    LASTDATE( 'Product Inventory'[Movement Date] )
+			)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Inventory Maximum Value' =
+			CALCULATE(
+			    SUM( 'Product Inventory'[Product-Date Max Inventory Value] ),
+			    LASTDATE( 'Product Inventory'[Movement Date] )
+			)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Total Inventory Value Performance' =
+			IF(
+			    [Total Inventory Value] < [Total Inventory Optimal Value],
+			    -( 1 - ( [Total Inventory Value] / [Total Inventory Optimal Value] ) ),
+			    ( [Total Inventory Value] - [Total Inventory Optimal Value] )
+			        / ( [Total Inventory Maximum Value] - [Total Inventory Optimal Value] )
+			)
+
+		kpi
+			targetExpression = 0
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Total Inventory Value Performance] ),
+				    BLANK( ),
+				    IF(
+				        [Total Inventory Value Performance] < 0,
+				        IF( [Total Inventory Value Performance] < -0.2, -1, 0 ),
+				        IF( [Total Inventory Value Performance] < 0.6, 1, IF( [Total Inventory Value Performance] < 1, 0, -1 ) )
+				    )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Centered
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 4
+
+			annotation KpiThreshold_0 = -0.2
+
+			annotation KpiThreshold_1 = 0
+
+			annotation KpiThreshold_2 = 0.6
+
+			annotation KpiThreshold_3 = 1
+
+	measure 'Products OverStocked' = CALCULATE( SUM( 'Product Inventory'[Product-Date OverStocked] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+
+		kpi
+			targetExpression = 0
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Products OverStocked] ),
+				    BLANK( ),
+				    IF( [Products OverStocked] < 1, 1, IF( [Products OverStocked] < 5, 0, -1 ) )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = LinearReversed
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 1
+
+			annotation KpiThreshold_1 = 5
+
+	measure 'Products UnderStocked' = CALCULATE( SUM( 'Product Inventory'[Product-Date UnderStocked] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+
+		kpi
+			targetExpression = 0
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Products UnderStocked] ),
+				    BLANK( ),
+				    IF( [Products UnderStocked] < 5, 1, IF( [Products UnderStocked] < 15, 0, -1 ) )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = LinearReversed
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 5
+
+			annotation KpiThreshold_1 = 15
+
+	measure 'Products with Negative Stock' = CALCULATE( SUM( 'Product Inventory'[Product-Date Negative Stock] ), LASTDATE( 'Product Inventory'[Movement Date] ) )
+
+		kpi
+			targetExpression = 0
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK( [Products with Negative Stock] ),
+				    BLANK( ),
+				    IF( [Products with Negative Stock] < 0.1, 1, IF( [Products with Negative Stock] < 5, 0, -1 ) )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = LinearReversed
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 0.1
+
+			annotation KpiThreshold_1 = 5
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		sourceColumn: ProductKey
+
+	column DateKey
+		dataType: int64
+		isHidden
+		sourceColumn: DateKey
+
+	column 'Movement Date'
+		dataType: dateTime
+		formatString: Short Date
+		sourceColumn: MovementDate
+
+		annotation Format = <Format Format="DateTimeShortDatePattern" xmlns="" />
+
+	column 'Unit Cost'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: UnitCost
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Units In'
+		dataType: int64
+		sourceColumn: UnitsIn
+
+	column 'Units Out'
+		dataType: int64
+		sourceColumn: UnitsOut
+
+	column 'Units Balance'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: UnitsBalance
+
+	column 'Product-Date Inventory Value' = 'Product Inventory'[Unit Cost] * 'Product Inventory'[Units Balance]
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Product-Date Optimal Inventory Value' = 'Product Inventory'[Unit Cost] * RELATED( Product[Reorder Point] )
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Product-Date Max Inventory Value' = 'Product Inventory'[Unit Cost] * RELATED( Product[Safety Stock Level] )
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Product-Date OverStocked' = IF( 'Product Inventory'[Units Balance] > RELATED( Product[Safety Stock Level] ), 1, 0 )
+
+	column 'Product-Date UnderStocked' = IF( 'Product Inventory'[Units Balance] < RELATED( Product[Reorder Point] ), 1, 0 )
+
+	column 'Product-Date Negative Stock' = IF( 'Product Inventory'[Units Balance] < 0, 1, 0 )
+
+	partition 'Product Inventory 2005' = query
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20050101) AND ([DateKey] <= 20051231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+	partition 'Product Inventory 2006' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20060101) AND ([DateKey] <= 20061231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+	partition 'Product Inventory 2007' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20070101) AND ([DateKey] <= 20071231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+	partition 'Product Inventory 2008' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20080101) AND ([DateKey] <= 20081231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+	partition 'Product Inventory 2009' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20090101) AND ([DateKey] <= 20091231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+	partition 'Product Inventory 2010' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactProductInventory].* 		FROM [dbo].[FactProductInventory]  WHERE (([DateKey] >= 20100101) AND ([DateKey] <= 20101231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+

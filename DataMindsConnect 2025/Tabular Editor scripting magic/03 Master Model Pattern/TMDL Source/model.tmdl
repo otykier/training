@@ -1,0 +1,34 @@
+model Model
+	culture: en-US
+	discourageImplicitMeasures
+
+annotation TabularEditor_SerializeOptions = {"IgnoreInferredObjects":false,"IgnoreInferredProperties":false,"IgnoreTimestamps":false,"SplitMultilineStrings":false,"PrefixFilenames":false,"LocalTranslations":false,"LocalPerspectives":false,"LocalRelationships":false,"Levels":["Data Sources","Perspectives","Relationships","Roles","Shared Expressions","Tables","Tables/Calculation Items","Tables/Columns","Tables/Hierarchies","Tables/Measures","Tables/Partitions","Translations"]}
+
+annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":[]}
+
+annotation BestPracticeAnalyzer_ExternalRuleFiles = ["https://raw.githubusercontent.com/microsoft/Analysis-Services/master/BestPracticeRules/BPARules.json"]
+
+annotation __TEdtr = 1
+
+annotation TabularProcessingBatch_test = full
+
+ref table Currency
+ref table Customer
+ref table Date
+ref table Employee
+ref table Geography
+ref table Product
+ref table 'Product Category'
+ref table 'Product Subcategory'
+ref table Promotion
+ref table Reseller
+ref table 'Sales Territory'
+ref table 'Internet Sales'
+ref table 'Product Inventory'
+ref table 'Reseller Sales'
+ref table 'Sales Quota'
+
+ref perspective $Inventory
+ref perspective '$Internet Operation'
+ref perspective '$Reseller Operation'
+

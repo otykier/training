@@ -1,0 +1,409 @@
+table 'Internet Sales'
+
+	defaultDetailRowsDefinition =
+			SELECTCOLUMNS (
+			    'Internet Sales',
+			    'Internet Sales'[Customer PO Number],
+			    'Internet Sales'[Discount Amount],
+			    'Internet Sales'[Sales Amount],
+			    "Product Name", RELATED ( 'Product'[Product Name] ),
+			    "Product Category", RELATED ( 'Product Category'[Product Category Name] )
+			)
+
+	measure 'Internet Distinct Count Sales Order' = DISTINCTCOUNT('Internet Sales'[Sales Order Number])
+		formatString: #,0
+
+	measure 'Internet Total Discount Amount' = SUM( 'Internet Sales'[Discount Amount] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Total Product Cost' = SUM( 'Internet Sales'[Total Product Cost] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Total Tax Amount' = SUM( 'Internet Sales'[Tax Amount] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Total Freight' = SUM( 'Internet Sales'[Freight] )
+		formatString: #,##0.00
+
+	measure 'Internet Total Gross Profit' = SUM( 'Internet Sales'[Gross Profit] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Order Lines Count' = COUNT( 'Internet Sales'[Sales Order Line Number] )
+		formatString: #,0
+
+	measure 'Internet Previous Quarter Gross Profit' =
+			CALCULATE(
+			    [Internet Total Gross Profit],
+			    PREVIOUSQUARTER( 'Date'[Date] )
+			)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Current Quarter Gross Profit' = TOTALQTD( [Internet Total Gross Profit], 'Date'[Date] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Previous Quarter Gross Profit Proportion to QTD' =
+			[Internet Previous Quarter Gross Profit]
+			    * ( [Days In Current Quarter to Date]
+			    / [Days In Current Quarter] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Previous Quarter Sales' =
+			CALCULATE(
+			    [Internet Total Sales],
+			    PREVIOUSQUARTER( 'Date'[Date] )
+			) + [Days In Current Quarter]
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Current Quarter Sales' = TOTALQTD( [Internet Total Sales], 'Date'[Date] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Previous Quarter Sales Proportion to QTD' =
+			[Internet Previous Quarter Sales]
+			    * ( [Days In Current Quarter] / [Days In Current Quarter] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+		annotation Format = <Format Format="Currency" Accuracy="2"><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	measure 'Internet Current Quarter Sales Performance' =
+			IFERROR(
+			    [Internet Current Quarter Sales]
+			        / [Internet Previous Quarter Sales Proportion to QTD],
+			    BLANK( )
+			)
+
+		kpi
+			targetExpression = 1.1
+			statusGraphic: Gauge
+			statusExpression =
+				IF(
+				    ISBLANK( [Internet Current Quarter Sales Performance] ),
+				    BLANK( ),
+				    IF(
+				        [Internet Current Quarter Sales Performance] < 1,
+				        -1,
+				        IF(
+				            [Internet Current Quarter Sales Performance] < 1.07,
+				            0,
+				            1
+				        )
+				    )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Linear
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 1
+
+			annotation KpiThreshold_1 = 1.07
+
+	measure 'Internet Current Quarter Gross Profit Performance' =
+			IF(
+			    [Internet Previous Quarter Gross Profit Proportion to QTD]
+			        <> 0,
+			    ( [Internet Current Quarter Gross Profit]
+			        - [Internet Previous Quarter Gross Profit Proportion to QTD] )
+			        / [Internet Previous Quarter Gross Profit Proportion to QTD],
+			    BLANK( )
+			)
+		formatString: #,##0.00 %
+
+		kpi
+			targetExpression = 1.25
+			statusGraphic: Three Symbols UnCircled Colored
+			statusExpression =
+				IF(
+				    ISBLANK(
+				        [Internet Current Quarter Gross Profit Performance]
+				    ),
+				    BLANK( ),
+				    IF(
+				        [Internet Current Quarter Gross Profit Performance] < 0.8,
+				        -1,
+				        IF(
+				            [Internet Current Quarter Gross Profit Performance] < 1.03,
+				            0,
+				            1
+				        )
+				    )
+				)
+
+			annotation GoalType = StaticValue
+
+			annotation KpiStatusType = Linear
+
+			annotation KpiThresholdType = Absolute
+
+			annotation KpiThresholdOrdering = Ascending
+
+			annotation KpiThresholdCount = 2
+
+			annotation KpiThreshold_0 = 0.8
+
+			annotation KpiThreshold_1 = 1.03
+
+	measure 'Internet Total Sales' = SUM( 'Internet Sales'[Sales Amount] )
+		formatString: 0
+
+	measure 'Internet Total Units' = SUM( 'Internet Sales'[Order Quantity] )
+		formatString: #,0
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+	column OrderDateKey
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: OrderDateKey
+
+	column DueDateKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: DueDateKey
+
+	column ShipDateKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ShipDateKey
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+	column PromotionKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: PromotionKey
+
+	column CurrencyKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: CurrencyKey
+
+	column SalesTerritoryKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: SalesTerritoryKey
+
+	column 'Sales Order Number'
+		dataType: string
+		sourceColumn: SalesOrderNumber
+
+	column 'Sales Order Line Number'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SalesOrderLineNumber
+
+	column 'Revision Number'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: RevisionNumber
+
+	column 'Order Quantity'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: OrderQuantity
+
+	column 'Unit Price'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: UnitPrice
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Extended Amount'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: ExtendedAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Unit Price Discount Pct'
+		dataType: double
+		summarizeBy: none
+		sourceColumn: UnitPriceDiscountPct
+
+	column 'Discount Amount'
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		summarizeBy: none
+		sourceColumn: DiscountAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Product Standard Cost'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: ProductStandardCost
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Total Product Cost'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: TotalProductCost
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Sales Amount'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: SalesAmount
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Tax Amount'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: TaxAmt
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column Freight
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: Freight
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	column 'Carrier Tracking Number'
+		dataType: string
+		sourceColumn: CarrierTrackingNumber
+
+	column 'Customer PO Number'
+		dataType: string
+		isAvailableInMdx: false
+		sourceColumn: CustomerPONumber
+
+	column 'Order Date'
+		dataType: dateTime
+		sourceColumn: OrderDate
+
+	column 'Due Date'
+		dataType: dateTime
+		isHidden
+		formatString: dd.MM.yyyy
+		sourceColumn: DueDate
+
+	column 'Ship Date'
+		dataType: dateTime
+		sourceColumn: ShipDate
+
+	column 'Gross Profit' =
+			'Internet Sales'[Sales Amount]
+			    - 'Internet Sales'[Total Product Cost]
+		summarizeBy: none
+
+		annotation Format = <Format Format="Currency" Accuracy="2" ThousandSeparator="True" xmlns=""><Currency LCID="1033" DisplayName="$ English (United States)" Symbol="$" PositivePattern="0" NegativePattern="0" /></Format>
+
+	partition 'Internet Sales 2010' = query
+		mode: import
+		source
+			query = SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales]  WHERE (([OrderDateKey] >= 20100101) AND ([OrderDateKey] <= 20101231))
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2011' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20110101) AND ([OrderDateKey] <= 20111231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2012' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20120101) AND ([OrderDateKey] <= 20121231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2013' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20130101) AND ([OrderDateKey] <= 20131231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2014' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20140101) AND ([OrderDateKey] <= 20141231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+		annotation TabularProcessingBatch_test = 1
+
+	partition 'Internet Sales 2015' = query
+		mode: import
+		source
+			query = ```
+				SELECT [dbo].[FactInternetSales].* 		FROM [dbo].[FactInternetSales] 
+				WHERE (([OrderDateKey] >= 20150101) AND ([OrderDateKey] <= 20151231))
+				```
+			dataSource: 'SqlServer localhost'
+
+		annotation TableWidgetSourceTable
+
+		annotation TabularProcessingBatch_test = 1
+
