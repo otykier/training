@@ -60,18 +60,41 @@ Action<string, string> AddCalc = (s, t) => {
     flowPanel.Controls.Add(panel);
 };
 
-AddLabel("Choose Date column:");
+AddLabel("Choose Date column or calendar:");
 var dateColumnSelector = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, AutoSize = true, Width = 300 };
+
+Action CheckCalc = () => {
+    var calendar = (dateColumnSelector.SelectedItem as ComboBoxItem).Calendar;
+    if (calendar == null) {
+        // Disable week-based time intelligence:
+        checks[0].Enabled = false;
+        checks[0].Checked = false;
+        checks[2].Enabled = true;
+        checks[2].Enabled = true;
+    }
+    else {
+        checks[0].Enabled = calendar.GetTimeUnits().Any(t => t.TimeUnit is TimeUnit.Week or TimeUnit.WeekOfMonth or TimeUnit.WeekOfYear);
+        checks[0].Checked = checks[0].Enabled;
+        checks[2].Enabled = calendar.GetTimeUnits().Any(t => t.TimeUnit is TimeUnit.Quarter or TimeUnit.QuarterOfYear);
+        checks[2].Checked = checks[2].Enabled;
+    }
+};
+
+dateColumnSelector.SelectionChangeCommitted += (s, e) => CheckCalc();
+
 var dateColumns = Model.AllColumns.Where(c => c.DataType == DataType.DateTime && c.IsKey).ToList();
-if(dateColumns.Count == 0) {
-    Info("Model contains no Date columns (i.e. a DateTime column on a table marked as a \"Date Table\"");
+var calendars = Model.AllCalendars.ToList();
+if(dateColumns.Count + calendars.Count == 0) {
+    Info("Model contains no Date columns (i.e. a DateTime column on a table marked as a \"Date Table\" or Calendars.");
     return;
 }
 dateColumnSelector.Items.AddRange(dateColumns.Select(c => new ComboBoxItem(c)).ToArray());
+dateColumnSelector.Items.AddRange(calendars.Select(c => new ComboBoxItem(c)).ToArray());
 dateColumnSelector.SelectedIndex = 0;
 flowPanel.Controls.Add(dateColumnSelector);
 
 AddLabel("Choose Time Intelligence calculations and suffixes:");
+AddCalc("Agg. week-to-date", "WTD");
 AddCalc("Agg. month-to-date", "MTD");
 AddCalc("Agg. quarter-to-date", "QTD");
 AddCalc("Agg. year-to-date", "YTD");
@@ -94,10 +117,13 @@ aggForm.Controls.Add(flowPanel);
 aggForm.AcceptButton = okButton;
 aggForm.CancelButton = cancelButton;
 
+CheckCalc();
+
 if(aggForm.ShowDialog() == DialogResult.Cancel) return;
 
 var displayFolder = displayFolderTextbox.Text;
-var dateColumn = (dateColumnSelector.SelectedItem as ComboBoxItem).Column.DaxObjectFullName;
+var item = dateColumnSelector.SelectedItem as ComboBoxItem;
+var dateColumn = item.Column == null ? item.Calendar.DaxObjectFullName : item.Column.DaxObjectFullName;
 
 // ==================================== Actual logic for adding measures below this line =================================
 
@@ -105,62 +131,70 @@ var dateColumn = (dateColumnSelector.SelectedItem as ComboBoxItem).Column.DaxObj
 foreach(var m in Selected.Measures) 
 {
 
-    // Month-to-date:
+    // Week-to-date:
     if(checks[0].Checked)
         m.Table.AddMeasure(
             m.Name + " " + suffixes[0].Text,
+            "TOTALWTD(" + m.DaxObjectName + ", " + dateColumn + ")",
+            displayFolder
+        );
+
+    // Month-to-date:
+    if(checks[1].Checked)
+        m.Table.AddMeasure(
+            m.Name + " " + suffixes[1].Text,
             "TOTALMTD(" + m.DaxObjectName + ", " + dateColumn + ")",
             displayFolder
         );
 
     // Quarter-to-date:
-    if(checks[1].Checked)
+    if(checks[2].Checked)
         m.Table.AddMeasure(
-            m.Name + " " + suffixes[1].Text,
+            m.Name + " " + suffixes[2].Text,
             "TOTALQTD(" + m.DaxObjectName + ", " + dateColumn + ")",
             displayFolder
         );
 
     // Year-to-date:
-    if(checks[2].Checked)
+    if(checks[3].Checked)
         m.Table.AddMeasure(
-            m.Name + " " + suffixes[2].Text,
+            m.Name + " " + suffixes[3].Text,
             "TOTALYTD(" + m.DaxObjectName + ", " + dateColumn + ")",
             displayFolder
         );
 
     // 1 year prior:
-    if(checks[3].Checked)
+    if(checks[4].Checked)
         m.Table.AddMeasure(
-            m.Name + " " + suffixes[3].Text,
+            m.Name + " " + suffixes[4].Text,
             string.Format("CALCULATE({0}, PARALLELPERIOD({1}, -1, YEAR))", m.DaxObjectName, dateColumn),
             displayFolder
         );
 
     // 2 years prior:
-    if(checks[4].Checked)
+    if(checks[5].Checked)
         m.Table.AddMeasure(
-            m.Name + " " + suffixes[4].Text,
+            m.Name + " " + suffixes[5].Text,
             string.Format("CALCULATE({0}, PARALLELPERIOD({1}, -2, YEAR))", m.DaxObjectName, dateColumn),
             displayFolder
         );
         
-    var pyMeasure = checks[3].Checked 
-        ? "[" + m.Name + " " + suffixes[3].Text + "]"
+    var pyMeasure = checks[4].Checked 
+        ? "[" + m.Name + " " + suffixes[4].Text + "]"
         : string.Format("CALCULATE({0}, PARALLELPERIOD({1}, -1, YEAR))", m.DaxObjectName, dateColumn);
 
     // Year-over-year:
-    if(checks[5].Checked)
+    if(checks[6].Checked)
         m.Table.AddMeasure(
-            m.Name + " " + suffixes[5].Text,
+            m.Name + " " + suffixes[6].Text,
             m.DaxObjectName + " - " + pyMeasure,
             displayFolder
         );
 
     // 2 years prior:
-    if(checks[6].Checked)
+    if(checks[7].Checked)
         m.Table.AddMeasure(
-            m.Name + " " + suffixes[6].Text,
+            m.Name + " " + suffixes[7].Text,
             string.Format("DIVIDE({0} - {1}, {1})", m.DaxObjectName, pyMeasure),
             displayFolder
         ).FormatString = "0.0 %";
@@ -171,6 +205,8 @@ foreach(var m in Selected.Measures)
 class ComboBoxItem
 {
     public Column Column { get; private set; }
+    public Calendar Calendar { get; private set; }
     public ComboBoxItem(Column column) { this.Column = column; }
-    public override string ToString() { return Column.DaxObjectFullName; }
+    public ComboBoxItem(Calendar calendar) { this.Calendar = calendar; }
+    public override string ToString() { return Calendar == null ? ("Column: " + Column.DaxObjectFullName) : ("Calendar: " + Calendar.DaxObjectFullName); }
 }

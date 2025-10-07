@@ -1,0 +1,1037 @@
+{
+  "name": "Demo 1-4 Parameter Table",
+  "compatibilityLevel": 1702,
+  "model": {
+    "culture": "en-US",
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "SQLDW",
+        "connectionDetails": {
+          "protocol": "tds",
+          "address": {
+            "server": "localhost",
+            "database": "AdventureWorksDW2019"
+          }
+        },
+        "credential": {
+          "AuthenticationKind": "ServiceAccount"
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "Date",
+        "dataCategory": "Time",
+        "columns": [
+          {
+            "name": "DateKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "DateKey"
+          },
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "isKey": true,
+            "sourceColumn": "Date",
+            "annotations": [
+              {
+                "name": "TabularEditor_MarkAsDateKey",
+                "value": "1"
+              }
+            ]
+          },
+          {
+            "name": "Day Number Of Week",
+            "dataType": "int64",
+            "sourceColumn": "DayNumberOfWeek"
+          },
+          {
+            "name": "English Day Name Of Week",
+            "dataType": "string",
+            "sourceColumn": "EnglishDayNameOfWeek",
+            "sortByColumn": "Day Number Of Week"
+          },
+          {
+            "name": "Spanish Day Name Of Week",
+            "dataType": "string",
+            "sourceColumn": "SpanishDayNameOfWeek"
+          },
+          {
+            "name": "French Day Name Of Week",
+            "dataType": "string",
+            "sourceColumn": "FrenchDayNameOfWeek"
+          },
+          {
+            "name": "Day Number Of Month",
+            "dataType": "int64",
+            "sourceColumn": "DayNumberOfMonth"
+          },
+          {
+            "name": "Day Number Of Year",
+            "dataType": "int64",
+            "sourceColumn": "DayNumberOfYear"
+          },
+          {
+            "name": "Week Number Of Year",
+            "dataType": "int64",
+            "sourceColumn": "WeekNumberOfYear"
+          },
+          {
+            "name": "English Month Name",
+            "dataType": "string",
+            "sourceColumn": "EnglishMonthName",
+            "sortByColumn": "Month Number Of Year"
+          },
+          {
+            "name": "Spanish Month Name",
+            "dataType": "string",
+            "sourceColumn": "SpanishMonthName"
+          },
+          {
+            "name": "French Month Name",
+            "dataType": "string",
+            "sourceColumn": "FrenchMonthName"
+          },
+          {
+            "name": "Month Number Of Year",
+            "dataType": "int64",
+            "sourceColumn": "MonthNumberOfYear"
+          },
+          {
+            "name": "Calendar Quarter",
+            "dataType": "int64",
+            "sourceColumn": "CalendarQuarter"
+          },
+          {
+            "name": "Calendar Year",
+            "dataType": "int64",
+            "sourceColumn": "CalendarYear"
+          },
+          {
+            "name": "Calendar Semester",
+            "dataType": "int64",
+            "sourceColumn": "CalendarSemester"
+          },
+          {
+            "name": "Fiscal Quarter",
+            "dataType": "int64",
+            "sourceColumn": "FiscalQuarter"
+          },
+          {
+            "name": "Fiscal Year",
+            "dataType": "int64",
+            "sourceColumn": "FiscalYear"
+          },
+          {
+            "name": "Fiscal Semester",
+            "dataType": "int64",
+            "sourceColumn": "FiscalSemester"
+          },
+          {
+            "type": "calculated",
+            "name": "Month Number Of Quarter",
+            "dataType": "int64",
+            "expression": "INT((MONTH('Date'[Date]) + 2) / 3)"
+          },
+          {
+            "type": "calculated",
+            "name": "Fiscal Month Name",
+            "dataType": "string",
+            "expression": "'Date'[English Month Name]",
+            "sortByColumn": "Month Number Of Quarter"
+          },
+          {
+            "type": "calculated",
+            "name": "ISO Year",
+            "expression": "YEAR('Date'[Date] + 26 - 'Date'[ISO Week of Year])"
+          },
+          {
+            "type": "calculated",
+            "name": "ISO Week of Year",
+            "expression": "WEEKNUM('Date'[Date], 21)"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Date",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": "let\n    Source = #\"SQLDW\",\n    Data = Source{[Schema=\"dbo\",Item=\"DimDate\"]}[Data]\nin\n    Data"
+            }
+          }
+        ],
+        "calendars": [
+          {
+            "name": "Y-M-D",
+            "calendarColumnGroups": [
+              {
+                "timeUnit": "year",
+                "primaryColumn": "Calendar Year"
+              },
+              {
+                "timeUnit": "monthOfYear",
+                "primaryColumn": "English Month Name"
+              },
+              {
+                "timeUnit": "date",
+                "primaryColumn": "Date"
+              }
+            ]
+          },
+          {
+            "name": "Fiscal",
+            "calendarColumnGroups": [
+              {
+                "timeUnit": "year",
+                "primaryColumn": "Fiscal Year"
+              },
+              {
+                "timeUnit": "quarterOfYear",
+                "primaryColumn": "Fiscal Quarter"
+              },
+              {
+                "timeUnit": "monthOfQuarter",
+                "primaryColumn": "Fiscal Month Name"
+              },
+              {
+                "timeUnit": "date",
+                "primaryColumn": "Date"
+              }
+            ]
+          },
+          {
+            "name": "Y-W-D",
+            "calendarColumnGroups": [
+              {
+                "timeUnit": "year",
+                "primaryColumn": "ISO Year"
+              },
+              {
+                "timeUnit": "weekOfYear",
+                "primaryColumn": "ISO Week of Year"
+              },
+              {
+                "timeUnit": "dayOfWeek",
+                "primaryColumn": "English Day Name Of Week"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Customer",
+        "columns": [
+          {
+            "name": "CustomerKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "CustomerKey"
+          },
+          {
+            "name": "GeographyKey",
+            "dataType": "int64",
+            "sourceColumn": "GeographyKey"
+          },
+          {
+            "name": "CustomerAlternateKey",
+            "dataType": "string",
+            "sourceColumn": "CustomerAlternateKey"
+          },
+          {
+            "name": "Title",
+            "dataType": "string",
+            "sourceColumn": "Title"
+          },
+          {
+            "name": "First Name",
+            "dataType": "string",
+            "sourceColumn": "FirstName"
+          },
+          {
+            "name": "Middle Name",
+            "dataType": "string",
+            "sourceColumn": "MiddleName"
+          },
+          {
+            "name": "Last Name",
+            "dataType": "string",
+            "sourceColumn": "LastName"
+          },
+          {
+            "name": "Name Style",
+            "dataType": "boolean",
+            "sourceColumn": "NameStyle"
+          },
+          {
+            "name": "Birth Date",
+            "dataType": "dateTime",
+            "sourceColumn": "BirthDate"
+          },
+          {
+            "name": "Marital Status",
+            "dataType": "string",
+            "sourceColumn": "MaritalStatus"
+          },
+          {
+            "name": "Suffix",
+            "dataType": "string",
+            "sourceColumn": "Suffix"
+          },
+          {
+            "name": "Gender",
+            "dataType": "string",
+            "sourceColumn": "Gender"
+          },
+          {
+            "name": "Email Address",
+            "dataType": "string",
+            "sourceColumn": "EmailAddress"
+          },
+          {
+            "name": "Yearly Income",
+            "dataType": "decimal",
+            "sourceColumn": "YearlyIncome"
+          },
+          {
+            "name": "Total Children",
+            "dataType": "int64",
+            "sourceColumn": "TotalChildren"
+          },
+          {
+            "name": "Number Children At Home",
+            "dataType": "int64",
+            "sourceColumn": "NumberChildrenAtHome"
+          },
+          {
+            "name": "English Education",
+            "dataType": "string",
+            "sourceColumn": "EnglishEducation"
+          },
+          {
+            "name": "Spanish Education",
+            "dataType": "string",
+            "sourceColumn": "SpanishEducation"
+          },
+          {
+            "name": "French Education",
+            "dataType": "string",
+            "sourceColumn": "FrenchEducation"
+          },
+          {
+            "name": "English Occupation",
+            "dataType": "string",
+            "sourceColumn": "EnglishOccupation"
+          },
+          {
+            "name": "Spanish Occupation",
+            "dataType": "string",
+            "sourceColumn": "SpanishOccupation"
+          },
+          {
+            "name": "French Occupation",
+            "dataType": "string",
+            "sourceColumn": "FrenchOccupation"
+          },
+          {
+            "name": "House Owner Flag",
+            "dataType": "string",
+            "sourceColumn": "HouseOwnerFlag"
+          },
+          {
+            "name": "Number Cars Owned",
+            "dataType": "int64",
+            "sourceColumn": "NumberCarsOwned"
+          },
+          {
+            "name": "Address Line 1",
+            "dataType": "string",
+            "sourceColumn": "AddressLine1"
+          },
+          {
+            "name": "Address Line 2",
+            "dataType": "string",
+            "sourceColumn": "AddressLine2"
+          },
+          {
+            "name": "Phone",
+            "dataType": "string",
+            "sourceColumn": "Phone"
+          },
+          {
+            "name": "Date First Purchase",
+            "dataType": "dateTime",
+            "sourceColumn": "DateFirstPurchase"
+          },
+          {
+            "name": "Commute Distance",
+            "dataType": "string",
+            "sourceColumn": "CommuteDistance"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Customer",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": "let\n    Source = #\"SQLDW\",\n    Data = Source{[Schema=\"dbo\",Item=\"DimCustomer\"]}[Data]\nin\n    Data"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Product",
+        "columns": [
+          {
+            "name": "ProductKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "ProductKey"
+          },
+          {
+            "name": "ProductAlternateKey",
+            "dataType": "string",
+            "sourceColumn": "ProductAlternateKey"
+          },
+          {
+            "name": "ProductSubcategoryKey",
+            "dataType": "int64",
+            "sourceColumn": "ProductSubcategoryKey"
+          },
+          {
+            "name": "Weight Unit Measure Code",
+            "dataType": "string",
+            "sourceColumn": "WeightUnitMeasureCode"
+          },
+          {
+            "name": "Size Unit Measure Code",
+            "dataType": "string",
+            "sourceColumn": "SizeUnitMeasureCode"
+          },
+          {
+            "name": "English Product Name",
+            "dataType": "string",
+            "sourceColumn": "EnglishProductName"
+          },
+          {
+            "name": "Spanish Product Name",
+            "dataType": "string",
+            "sourceColumn": "SpanishProductName"
+          },
+          {
+            "name": "French Product Name",
+            "dataType": "string",
+            "sourceColumn": "FrenchProductName"
+          },
+          {
+            "name": "Standard Cost",
+            "dataType": "decimal",
+            "sourceColumn": "StandardCost"
+          },
+          {
+            "name": "Finished Goods Flag",
+            "dataType": "boolean",
+            "sourceColumn": "FinishedGoodsFlag"
+          },
+          {
+            "name": "Color",
+            "dataType": "string",
+            "sourceColumn": "Color"
+          },
+          {
+            "name": "Safety Stock Level",
+            "dataType": "int64",
+            "sourceColumn": "SafetyStockLevel"
+          },
+          {
+            "name": "Reorder Point",
+            "dataType": "int64",
+            "sourceColumn": "ReorderPoint"
+          },
+          {
+            "name": "List Price",
+            "dataType": "decimal",
+            "sourceColumn": "ListPrice"
+          },
+          {
+            "name": "Size",
+            "dataType": "string",
+            "sourceColumn": "Size"
+          },
+          {
+            "name": "Size Range",
+            "dataType": "string",
+            "sourceColumn": "SizeRange"
+          },
+          {
+            "name": "Weight",
+            "dataType": "double",
+            "sourceColumn": "Weight"
+          },
+          {
+            "name": "Days To Manufacture",
+            "dataType": "int64",
+            "sourceColumn": "DaysToManufacture"
+          },
+          {
+            "name": "Product Line",
+            "dataType": "string",
+            "sourceColumn": "ProductLine"
+          },
+          {
+            "name": "Dealer Price",
+            "dataType": "decimal",
+            "sourceColumn": "DealerPrice"
+          },
+          {
+            "name": "Class",
+            "dataType": "string",
+            "sourceColumn": "Class"
+          },
+          {
+            "name": "Style",
+            "dataType": "string",
+            "sourceColumn": "Style"
+          },
+          {
+            "name": "Model Name",
+            "dataType": "string",
+            "sourceColumn": "ModelName"
+          },
+          {
+            "name": "Large Photo",
+            "dataType": "binary",
+            "sourceColumn": "LargePhoto"
+          },
+          {
+            "name": "English Description",
+            "dataType": "string",
+            "sourceColumn": "EnglishDescription"
+          },
+          {
+            "name": "French Description",
+            "dataType": "string",
+            "sourceColumn": "FrenchDescription"
+          },
+          {
+            "name": "Chinese Description",
+            "dataType": "string",
+            "sourceColumn": "ChineseDescription"
+          },
+          {
+            "name": "Arabic Description",
+            "dataType": "string",
+            "sourceColumn": "ArabicDescription"
+          },
+          {
+            "name": "Hebrew Description",
+            "dataType": "string",
+            "sourceColumn": "HebrewDescription"
+          },
+          {
+            "name": "Thai Description",
+            "dataType": "string",
+            "sourceColumn": "ThaiDescription"
+          },
+          {
+            "name": "German Description",
+            "dataType": "string",
+            "sourceColumn": "GermanDescription"
+          },
+          {
+            "name": "Japanese Description",
+            "dataType": "string",
+            "sourceColumn": "JapaneseDescription"
+          },
+          {
+            "name": "Turkish Description",
+            "dataType": "string",
+            "sourceColumn": "TurkishDescription"
+          },
+          {
+            "name": "Start Date",
+            "dataType": "dateTime",
+            "sourceColumn": "StartDate"
+          },
+          {
+            "name": "End Date",
+            "dataType": "dateTime",
+            "sourceColumn": "EndDate"
+          },
+          {
+            "name": "Status",
+            "dataType": "string",
+            "sourceColumn": "Status"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Product",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": "let\n    Source = #\"SQLDW\",\n    Data = Source{[Schema=\"dbo\",Item=\"DimProduct\"]}[Data]\nin\n    Data"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Internet Sales",
+        "columns": [
+          {
+            "name": "ProductKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "ProductKey"
+          },
+          {
+            "name": "OrderDateKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "OrderDateKey"
+          },
+          {
+            "name": "DueDateKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "DueDateKey"
+          },
+          {
+            "name": "ShipDateKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "ShipDateKey"
+          },
+          {
+            "name": "CustomerKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "CustomerKey"
+          },
+          {
+            "name": "PromotionKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "PromotionKey"
+          },
+          {
+            "name": "CurrencyKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "CurrencyKey"
+          },
+          {
+            "name": "SalesTerritoryKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "SalesTerritoryKey"
+          },
+          {
+            "name": "Sales Order Number",
+            "dataType": "string",
+            "sourceColumn": "SalesOrderNumber"
+          },
+          {
+            "name": "Sales Order Line Number",
+            "dataType": "int64",
+            "sourceColumn": "SalesOrderLineNumber"
+          },
+          {
+            "name": "Revision Number",
+            "dataType": "int64",
+            "sourceColumn": "RevisionNumber"
+          },
+          {
+            "name": "Order Quantity",
+            "dataType": "int64",
+            "sourceColumn": "OrderQuantity"
+          },
+          {
+            "name": "Unit Price",
+            "dataType": "decimal",
+            "sourceColumn": "UnitPrice"
+          },
+          {
+            "name": "ExtendedAmount",
+            "dataType": "decimal",
+            "isHidden": true,
+            "sourceColumn": "ExtendedAmount"
+          },
+          {
+            "name": "Unit Price Discount Pct",
+            "dataType": "double",
+            "sourceColumn": "UnitPriceDiscountPct"
+          },
+          {
+            "name": "DiscountAmount",
+            "dataType": "double",
+            "isHidden": true,
+            "sourceColumn": "DiscountAmount"
+          },
+          {
+            "name": "Product Standard Cost",
+            "dataType": "decimal",
+            "sourceColumn": "ProductStandardCost"
+          },
+          {
+            "name": "CostAmount",
+            "dataType": "decimal",
+            "isHidden": true,
+            "sourceColumn": "TotalProductCost"
+          },
+          {
+            "name": "SalesAmount",
+            "dataType": "decimal",
+            "isHidden": true,
+            "sourceColumn": "SalesAmount"
+          },
+          {
+            "name": "TaxAmount",
+            "dataType": "decimal",
+            "isHidden": true,
+            "sourceColumn": "TaxAmt"
+          },
+          {
+            "name": "FreightAmount",
+            "dataType": "decimal",
+            "isHidden": true,
+            "sourceColumn": "Freight"
+          },
+          {
+            "name": "Carrier Tracking Number",
+            "dataType": "string",
+            "sourceColumn": "CarrierTrackingNumber"
+          },
+          {
+            "name": "Customer PO Number",
+            "dataType": "string",
+            "sourceColumn": "CustomerPONumber"
+          },
+          {
+            "name": "Order Date",
+            "dataType": "dateTime",
+            "sourceColumn": "OrderDate"
+          },
+          {
+            "name": "Due Date",
+            "dataType": "dateTime",
+            "sourceColumn": "DueDate"
+          },
+          {
+            "name": "Ship Date",
+            "dataType": "dateTime",
+            "sourceColumn": "ShipDate"
+          },
+          {
+            "type": "calculated",
+            "name": "MarginAmount",
+            "dataType": "decimal",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "expression": "'Internet Sales'[SalesAmount] - 'Internet Sales'[CostAmount]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Internet Sales",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": "let\n    Source = #\"SQLDW\",\n    Data = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data]\nin\n    Data"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Cost Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[CostAmount]",
+            "expression": "SUM('Internet Sales'[CostAmount])",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Discount Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[DiscountAmount]",
+            "expression": "SUM('Internet Sales'[DiscountAmount])",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Extended Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[ExtendedAmount]",
+            "expression": "SUM('Internet Sales'[ExtendedAmount])",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Freight Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[FreightAmount]",
+            "expression": "SUM('Internet Sales'[FreightAmount])",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Margin Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[MarginAmount]",
+            "expression": "SUM('Internet Sales'[MarginAmount])",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Sales Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[SalesAmount]",
+            "expression": "SUM('Internet Sales'[SalesAmount])",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Tax Amount",
+            "description": "This measure is the sum of column 'Internet Sales'[TaxAmount]",
+            "expression": "SUM('Internet Sales'[TaxAmount])",
+            "formatString": "0.00"
+          }
+        ]
+      },
+      {
+        "name": "Promotion",
+        "columns": [
+          {
+            "name": "PromotionKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "PromotionKey"
+          },
+          {
+            "name": "PromotionAlternateKey",
+            "dataType": "int64",
+            "sourceColumn": "PromotionAlternateKey"
+          },
+          {
+            "name": "English Promotion Name",
+            "dataType": "string",
+            "sourceColumn": "EnglishPromotionName"
+          },
+          {
+            "name": "Spanish Promotion Name",
+            "dataType": "string",
+            "sourceColumn": "SpanishPromotionName"
+          },
+          {
+            "name": "French Promotion Name",
+            "dataType": "string",
+            "sourceColumn": "FrenchPromotionName"
+          },
+          {
+            "name": "Discount Pct",
+            "dataType": "double",
+            "sourceColumn": "DiscountPct"
+          },
+          {
+            "name": "English Promotion Type",
+            "dataType": "string",
+            "sourceColumn": "EnglishPromotionType"
+          },
+          {
+            "name": "Spanish Promotion Type",
+            "dataType": "string",
+            "sourceColumn": "SpanishPromotionType"
+          },
+          {
+            "name": "French Promotion Type",
+            "dataType": "string",
+            "sourceColumn": "FrenchPromotionType"
+          },
+          {
+            "name": "English Promotion Category",
+            "dataType": "string",
+            "sourceColumn": "EnglishPromotionCategory"
+          },
+          {
+            "name": "Spanish Promotion Category",
+            "dataType": "string",
+            "sourceColumn": "SpanishPromotionCategory"
+          },
+          {
+            "name": "French Promotion Category",
+            "dataType": "string",
+            "sourceColumn": "FrenchPromotionCategory"
+          },
+          {
+            "name": "Start Date",
+            "dataType": "dateTime",
+            "sourceColumn": "StartDate"
+          },
+          {
+            "name": "End Date",
+            "dataType": "dateTime",
+            "sourceColumn": "EndDate"
+          },
+          {
+            "name": "Min Qty",
+            "dataType": "int64",
+            "sourceColumn": "MinQty"
+          },
+          {
+            "name": "Max Qty",
+            "dataType": "int64",
+            "sourceColumn": "MaxQty"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Promotion",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": "let\n    Source = #\"SQLDW\",\n    Data = Source{[Schema=\"dbo\",Item=\"DimPromotion\"]}[Data]\nin\n    Data"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Currency",
+        "columns": [
+          {
+            "name": "CurrencyKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "CurrencyKey"
+          },
+          {
+            "name": "CurrencyAlternateKey",
+            "dataType": "string",
+            "sourceColumn": "CurrencyAlternateKey"
+          },
+          {
+            "name": "Currency Name",
+            "dataType": "string",
+            "sourceColumn": "CurrencyName"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Currency",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": "let\n    Source = #\"SQLDW\",\n    Data = Source{[Schema=\"dbo\",Item=\"DimCurrency\"]}[Data]\nin\n    Data"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sales Territory",
+        "columns": [
+          {
+            "name": "SalesTerritoryKey",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "SalesTerritoryKey"
+          },
+          {
+            "name": "SalesTerritoryAlternateKey",
+            "dataType": "int64",
+            "sourceColumn": "SalesTerritoryAlternateKey"
+          },
+          {
+            "name": "Sales Territory Region",
+            "dataType": "string",
+            "sourceColumn": "SalesTerritoryRegion"
+          },
+          {
+            "name": "Sales Territory Country",
+            "dataType": "string",
+            "sourceColumn": "SalesTerritoryCountry"
+          },
+          {
+            "name": "Sales Territory Group",
+            "dataType": "string",
+            "sourceColumn": "SalesTerritoryGroup"
+          },
+          {
+            "name": "Sales Territory Image",
+            "dataType": "binary",
+            "sourceColumn": "SalesTerritoryImage"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Sales Territory",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": "let\n    Source = #\"SQLDW\",\n    Data = Source{[Schema=\"dbo\",Item=\"DimSalesTerritory\"]}[Data]\nin\n    Data"
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "6762e18b-2e81-4c96-b607-8e193edd34fd",
+        "fromTable": "Internet Sales",
+        "fromColumn": "ProductKey",
+        "toTable": "Product",
+        "toColumn": "ProductKey"
+      },
+      {
+        "name": "090c5480-c546-4349-adab-9c276d8f738e",
+        "fromTable": "Internet Sales",
+        "fromColumn": "OrderDateKey",
+        "toTable": "Date",
+        "toColumn": "DateKey"
+      },
+      {
+        "name": "84e8c158-aff6-4122-8848-e0185973d4ac",
+        "fromTable": "Internet Sales",
+        "fromColumn": "DueDateKey",
+        "toTable": "Date",
+        "toColumn": "DateKey",
+        "isActive": false
+      },
+      {
+        "name": "8506b2b0-3891-493c-a1c6-b867fa20a8a3",
+        "fromTable": "Internet Sales",
+        "fromColumn": "ShipDateKey",
+        "toTable": "Date",
+        "toColumn": "DateKey",
+        "isActive": false
+      },
+      {
+        "name": "306ff065-2491-4a1d-b69a-9f47364407e4",
+        "fromTable": "Internet Sales",
+        "fromColumn": "CustomerKey",
+        "toTable": "Customer",
+        "toColumn": "CustomerKey"
+      },
+      {
+        "name": "495b098a-4d71-4b3a-a1ec-5cd10ea96ca1",
+        "fromTable": "Internet Sales",
+        "fromColumn": "PromotionKey",
+        "toTable": "Promotion",
+        "toColumn": "PromotionKey"
+      },
+      {
+        "name": "6a41a49c-5301-414a-9640-fb2ea18bc3de",
+        "fromTable": "Internet Sales",
+        "fromColumn": "CurrencyKey",
+        "toTable": "Currency",
+        "toColumn": "CurrencyKey"
+      },
+      {
+        "name": "9bd728ac-438b-483b-84ae-9dac15dd98f6",
+        "fromTable": "Internet Sales",
+        "fromColumn": "SalesTerritoryKey",
+        "toTable": "Sales Territory",
+        "toColumn": "SalesTerritoryKey"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "TabularEditor_SerializeOptions",
+        "value": "{\"IgnoreInferredObjects\":true,\"IgnoreInferredProperties\":true,\"IgnoreTimestamps\":true,\"SplitMultilineStrings\":false,\"PrefixFilenames\":false,\"LocalTranslations\":false,\"LocalPerspectives\":false,\"SortArrays\":false,\"LocalRelationships\":false,\"Levels\":[\"Data Sources\",\"Perspectives\",\"Relationships\",\"Roles\",\"Shared Expressions\",\"Tables\",\"Tables/Calculation Items\",\"Tables/Columns\",\"Tables/Hierarchies\",\"Tables/Measures\",\"Tables/Partitions\",\"Translations\"],\"IgnoreLineageTags\":true,\"IgnorePrivacySettings\":true,\"IgnoreIncrementalRefreshPartitions\":true}"
+      },
+      {
+        "name": "__TEdtr",
+        "value": "1"
+      }
+    ]
+  }
+}
